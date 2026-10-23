@@ -1,8 +1,14 @@
-# Neural networks, unpacked
+# Neural networks: structure and scale
 
 An interactive lecture demo from **MasanneckLab**: follow the computation from a tiny two-outcome neural network, through a trained digit classifier, to the architecture of a large language model.
 
 **[Open the live demo](https://masannecklab.github.io/neural-networks-explained/)** · **[Download lecture QR (PNG)](https://masannecklab.github.io/neural-networks-explained/assets/lecture-qr.png)** · **[QR as SVG](https://masannecklab.github.io/neural-networks-explained/assets/lecture-qr.svg)**
+
+## Language and presentation context
+
+The site opens in **German by default**. The **Deutsch / English** switch at the bottom changes all explanatory text, diagram labels, accessible labels, model notes, and guided-sequence captions. An explicit choice is remembered locally; blocked storage falls back to German. Switching language preserves the current inputs, chosen digit, transformer step, and timeline. Prompt chunks in the transformer illustration are localized examples, not actual tokenizer results.
+
+The header includes the DGN logo and the lecturer-supplied presentation context **“Presented at DGN”**. Logo provenance and its separate CC BY-SA 4.0 license are documented in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) and in the model-notes dialog.
 
 ## For a lecture or screen recording
 
@@ -87,6 +93,7 @@ npm run build
 ```text
 index.html                 Page shell, dialogs, model explanations
 src/app.js                 Interactive diagrams, input handling, timed story
+src/i18n.js                German/English text and state-preserving language switching
 src/models.js              Inference functions, bitmap templates, illustrative LLM values
 src/styles.css             Responsive layout and presentation mode
 public/assets/             Original model weights and favicon

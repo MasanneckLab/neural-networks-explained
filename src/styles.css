@@ -1948,3 +1948,241 @@ dialog h2 {
     display: none;
   }
 }
+
+/* Event identity and a language control that remains available in presentation mode. */
+.event-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--muted);
+}
+.event-brand span {
+  font-size: 11px;
+  letter-spacing: 0.3px;
+}
+.event-brand img {
+  display: block;
+  width: 100px;
+  height: auto;
+  mix-blend-mode: multiply;
+}
+.language-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 0 0 20px;
+}
+.language-label {
+  font-size: 11px;
+  color: var(--muted);
+}
+.language-switch {
+  display: flex;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--paper);
+}
+.language-switch button {
+  background: transparent;
+  font-size: 11px;
+  padding: 6px 12px;
+  border-radius: 4px;
+}
+.language-switch button.selected {
+  background: var(--teal);
+  color: white;
+}
+.logo-credit {
+  font-size: 9px;
+  line-height: 1.7;
+  color: var(--muted);
+  text-align: center;
+  margin-top: 18px;
+}
+html[lang="de"] .parameter-label span {
+  max-width: 310px;
+  line-height: 1.5;
+}
+html[lang="de"] .thread-note {
+  max-width: 235px;
+}
+html[lang="de"] .network-topline {
+  font-size: 9px;
+}
+html[lang="de"] .llm-workspace .primary-button {
+  white-space: normal;
+  line-height: 1.45;
+}
+html[lang="de"] .llm-trace .feedforward-mini {
+  font-size: 11px;
+}
+.presenting .language-bar {
+  padding: 8px 0;
+}
+@media (min-width: 801px) {
+  .presenting .event-brand img {
+    width: 82px;
+  }
+  .presenting .event-brand span {
+    font-size: 10px;
+  }
+  .presenting .intro {
+    padding: 10px 0;
+  }
+  .presenting .stage-heading {
+    padding-top: 12px;
+    padding-bottom: 10px;
+  }
+  .presenting .common-thread {
+    padding: 10px 0;
+  }
+  .presenting .story-strip {
+    margin-top: 8px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+  html[lang="de"] .presenting .panel-label {
+    font-size: 9px;
+  }
+  html[lang="de"] .presenting .input-panel .hint-box {
+    font-size: 9px;
+  }
+  html[lang="de"] .presenting .model-badge {
+    font-size: 7px;
+  }
+}
+@media (max-width: 1100px) {
+  .event-brand {
+    gap: 4px;
+  }
+  .event-brand span {
+    font-size: 10px;
+  }
+  .event-brand img {
+    width: 82px;
+  }
+  html[lang="de"] .chapter small {
+    font-size: 10px;
+  }
+  html[lang="de"] .parameter-label span {
+    max-width: 250px;
+  }
+}
+@media (max-width: 800px) {
+  .topbar {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .event-brand {
+    order: 3;
+    flex-basis: 100%;
+    justify-content: center;
+    gap: 7px;
+    border-top: 1px solid var(--line);
+    padding-top: 3px;
+  }
+  .event-brand img {
+    width: 76px;
+  }
+  .event-brand span {
+    font-size: 10px;
+  }
+  html[lang="de"] .stage-heading {
+    align-items: flex-start;
+  }
+  html[lang="de"] .stage-heading h2 {
+    font-size: 21px;
+  }
+  html[lang="de"] .parameter-label span {
+    max-width: 170px;
+  }
+}
+@media (max-width: 520px) {
+  .topbar {
+    gap: 6px;
+    padding-top: 12px;
+    padding-bottom: 8px;
+  }
+  .event-brand {
+    padding-top: 0;
+  }
+  .event-brand img {
+    width: 65px;
+  }
+  .language-bar {
+    padding-bottom: 22px;
+  }
+  .language-switch button {
+    min-height: 36px;
+    min-width: 78px;
+  }
+  html[lang="de"] .intro h1 {
+    font-size: 27px;
+  }
+  html[lang="de"] .stage-heading h2 {
+    font-size: 18px;
+  }
+  html[lang="de"] .parameter-label {
+    min-width: 95px;
+    max-width: 120px;
+  }
+  html[lang="de"] .parameter-label span {
+    font-size: 8px;
+  }
+  html[lang="de"] .llm-trace .feedforward-mini {
+    font-size: 9px;
+  }
+  html[lang="de"] .common-thread p {
+    font-size: 9px;
+  }
+  html[lang="de"] .thread-note {
+    display: none;
+  }
+  html[lang="de"] .chapter {
+    padding-left: 7px;
+    padding-right: 7px;
+  }
+  html[lang="de"] .chapter strong {
+    font-size: 10px;
+  }
+}
+
+/* Keep localized numbers intact and leave room for German candidate names. */
+.probability-row output {
+  white-space: nowrap;
+}
+.llm-workspace .probability-row {
+  grid-template-columns: 46px minmax(0, 1fr) 45px;
+}
+.digits-workspace .probability-row {
+  grid-template-columns: 12px minmax(0, 1fr) 45px;
+}
+@media (min-width: 801px) {
+  .presenting .topbar {
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+  .presenting .event-brand img {
+    width: 76px;
+  }
+  .presenting .trace {
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+  .presenting .language-bar {
+    padding-top: 5px;
+    padding-bottom: 5px;
+  }
+}
+@media (max-width: 520px) {
+  .digits-workspace .probability-row {
+    grid-template-columns: 10px minmax(0, 1fr) 39px;
+  }
+  .llm-workspace .probability-row {
+    grid-template-columns: 42px minmax(0, 1fr) 39px;
+    font-size: 9px;
+  }
+}

@@ -1,3 +1,4 @@
+import { initializeLanguage } from "./i18n.js";
 import {
   binaryForward,
   denseForward,
@@ -19,24 +20,24 @@ const colors = {
 const stages = [
   {
     hash: "small",
-    kicker: "01 / A NETWORK YOU CAN TRACE",
-    title: "Two switches. One simple decision.",
+    kicker: "01 / BINARY CLASSIFICATION",
+    title: "Binary classification with a small network",
     count: "12 parameters",
     description: "2 inputs → 2 hidden → 2 outputs",
     thread: "A neuron is a small calculation.",
   },
   {
     hash: "digits",
-    kicker: "02 / THE SAME OPERATIONS, MORE CONNECTIONS",
-    title: "From pixels to a predicted digit.",
+    kicker: "02 / DIGIT CLASSIFICATION",
+    title: "Digit classification from pixel inputs",
     count: "746 parameters",
     description: "35 inputs → 16 hidden → 10 outputs",
     thread: "Weights now come from training.",
   },
   {
     hash: "language",
-    kicker: "03 / SHARED BUILDING BLOCKS, ADDED STRUCTURE",
-    title: "Now, scale up to language.",
+    kicker: "03 / TRANSFORMER ARCHITECTURE",
+    title: "Architecture of a transformer language model",
     count: "~8 billion parameters",
     description: "Llama 3 8B · architecture reference",
     thread: "Attention adds context between tokens.",
@@ -258,7 +259,8 @@ function languageHTML() {
     languageExamples,
   )
     .map(
-      (c) => `<option ${c === state.country ? "selected" : ""}>${c}</option>`,
+      (c) =>
+        `<option value="${c}" ${c === state.country ? "selected" : ""}>${c}</option>`,
     )
     .join(
       "",
@@ -266,6 +268,10 @@ function languageHTML() {
 }
 function renderStage(index, fromTour = false) {
   if (!fromTour && tour.playing) pauseTour();
+  if (!fromTour && tour.active && index !== state.stage) {
+    $("#story-caption").textContent =
+      "Guided sequence paused. Resume to return to the current step in the sequence.";
+  }
   state.stage = index;
   state.selected = 0;
   const s = stages[index];
@@ -457,10 +463,10 @@ function renderLanguageTrace() {
   const ex = languageExamples[state.country];
   if (state.part === "attention") {
     $("#language-trace").innerHTML =
-      `<div><p class="trace-title">Attention adds context.</p><p class="trace-copy">An illustrative attention row for “is”.<br>Tokens can mix information from earlier tokens and themselves.</p></div><div class="attention-weights">${ex.tokens.map((t, i) => `<div class="attention-word ${i === 3 ? "strongest" : ""}"><div class="attention-track"><div class="attention-fill" style="height:${ex.attention[i] * 100}%"></div></div><span>${t}</span><small>${Math.round(ex.attention[i] * 100)}%</small></div>`).join("")}</div><p class="scale-note"><strong>softmax(QKᵀ / √d + M) V</strong><br>Q, K, V are learned projections. M masks future tokens. Displayed values are illustrative.</p>`;
+      `<div><p class="trace-title">Context integration through attention</p><p class="trace-copy">An illustrative attention row for “is”.<br>Tokens can mix information from earlier tokens and themselves.</p></div><div class="attention-weights">${ex.tokens.map((t, i) => `<div class="attention-word ${i === 3 ? "strongest" : ""}"><div class="attention-track"><div class="attention-fill" style="height:${ex.attention[i] * 100}%"></div></div><span>${t}</span><small>${Math.round(ex.attention[i] * 100)}%</small></div>`).join("")}</div><p class="scale-note"><strong>softmax(QKᵀ / √d + M) V</strong><br>Q, K, V are learned projections. M masks future tokens. Displayed values are illustrative.</p>`;
   } else {
     $("#language-trace").innerHTML =
-      `<div><p class="trace-title">A familiar network, inside.</p><p class="trace-copy">Each token passes through the same feed-forward network.</p></div><div><div class="feedforward-mini"><span class="mini-layer">${"<i></i>".repeat(9)}</span><span>→</span><span class="mini-layer">${"<i></i>".repeat(18)}</span><span>→</span><span class="mini-layer">${"<i></i>".repeat(9)}</span><span>Weighted transforms<br>+ a nonlinearity</span></div><p class="trace-copy" style="margin-top:9px">Llama uses a gated nonlinearity (SwiGLU), not the small demo’s ReLU.</p></div><p class="scale-note"><strong>Shared computational building blocks.</strong><br>More features, more layers, and learned representations make full explanations harder.</p>`;
+      `<div><p class="trace-title">Feed-forward sublayer</p><p class="trace-copy">Each token passes through the same feed-forward network.</p></div><div><div class="feedforward-mini"><span class="mini-layer">${"<i></i>".repeat(9)}</span><span>→</span><span class="mini-layer">${"<i></i>".repeat(18)}</span><span>→</span><span class="mini-layer">${"<i></i>".repeat(9)}</span><span>Weighted transforms<br>+ a nonlinearity</span></div><p class="trace-copy" style="margin-top:9px">Llama uses a gated nonlinearity (SwiGLU), not the small demo’s ReLU.</p></div><p class="scale-note"><strong>Shared computational building blocks.</strong><br>More features, more layers, and learned representations make full explanations harder.</p>`;
   }
 }
 const stepDescriptions = [
@@ -676,6 +682,8 @@ function toggleTour() {
   tour.active = true;
   tour.playing = true;
   tour.last = 0;
+  $("#story-caption").textContent =
+    storyEvents[Math.max(0, tour.event)].caption;
   $("#story-strip").hidden = false;
   updateTourControls();
   tour.raf = requestAnimationFrame(tourFrame);
@@ -815,6 +823,7 @@ async function loadModel() {
   }
   if (state.stage === 1) renderStage(1, true);
 }
+initializeLanguage(document);
 const initial = stages.findIndex((s) => location.hash === "#" + s.hash);
 renderStage(initial < 0 ? 0 : initial);
 await loadModel();
