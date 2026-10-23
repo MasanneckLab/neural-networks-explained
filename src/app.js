@@ -30,8 +30,8 @@ const stages = [
     hash: "digits",
     kicker: "02 / DIGIT CLASSIFICATION",
     title: "Digit classification from pixel inputs",
-    count: "746 parameters",
-    description: "35 inputs → 16 hidden → 10 outputs",
+    count: "1,598 parameters",
+    description: "35 → 24 → 16 → 12 → 10 neurons",
     thread: "Weights now come from training.",
   },
   {
@@ -49,6 +49,8 @@ const state = {
   b: 0,
   weight: 1,
   selected: 0,
+  layer: 0,
+  block: 1,
   pixels: [...digitPatterns[7]],
   digit: 7,
   country: "France",
@@ -80,12 +82,18 @@ function probabilities(p, labels) {
     .join("");
 }
 function svgNode(x, y, r, value, label, options = {}) {
-  const { selected = false, id = "", level = 0, small = false } = options;
+  const {
+    selected = false,
+    id = "",
+    level = 0,
+    small = false,
+    ariaLabel = "",
+  } = options;
   const fill =
     level > 0.05
       ? `color-mix(in srgb, #8eb69a ${Math.min(75, level * 65)}%, #fffefa)`
       : "#fffefa";
-  return `<g class="${id ? "node" : ""} ${selected ? "selected" : ""}" ${id ? `data-neuron="${id}" role="button" tabindex="0" aria-label="Inspect hidden neuron ${Number(id) + 1}"` : ""}><circle cx="${x}" cy="${y}" r="${r}" fill="${fill}" stroke="${level > 0.05 ? colors.teal : "#afbeb1"}" stroke-width="${selected ? 3 : 1.4}"/>${value !== "" ? `<text class="node-text" x="${x}" y="${y + 5}" text-anchor="middle" style="font-size:${small ? 9 : 16}px">${value}</text>` : ""}${label ? `<text class="node-caption" x="${x}" y="${y + r + 18}" text-anchor="middle">${label}</text>` : ""}</g>`;
+  return `<g class="${id ? "node" : ""} ${selected ? "selected" : ""}" ${id ? `data-neuron="${id}" role="button" tabindex="0" aria-label="${ariaLabel || `Inspect hidden neuron ${Number(id) + 1}`}"` : ""}><circle cx="${x}" cy="${y}" r="${r}" fill="${fill}" stroke="${level > 0.05 ? colors.teal : "#afbeb1"}" stroke-width="${selected ? 3 : 1.4}"/>${value !== "" ? `<text class="node-text" x="${x}" y="${y + 5}" text-anchor="middle" style="font-size:${small ? 9 : 16}px">${value}</text>` : ""}${label ? `<text class="node-caption" x="${x}" y="${y + r + 18}" text-anchor="middle">${label}</text>` : ""}</g>`;
 }
 function edge(
   x1,
@@ -170,68 +178,74 @@ function neuralSvg(data, large = false) {
         .join("");
     return `<svg class="network" viewBox="0 0 620 330" role="group" aria-label="Fully connected neural network with two inputs, two hidden neurons and two output probabilities"><text x="90" y="40" text-anchor="middle">INPUT</text><text x="310" y="40" text-anchor="middle">HIDDEN LAYER</text><text x="530" y="40" text-anchor="middle">OUTPUT</text>${lines}${nodes}</svg>`;
   }
-  const xs = [72, 310, 548],
-    positions = [35, 16, 10].map((n) =>
-      Array.from({ length: n }, (_, i) => 64 + (260 * i) / (n - 1)),
-    );
-  const hmax = Math.max(1, ...data.hidden);
-  let lines = "";
-  state.model.w1.forEach((row, j) =>
-    row.forEach((w, i) => {
-      const sel = j === state.selected;
-      lines += edge(
-        xs[0],
-        positions[0][i],
-        xs[1],
-        positions[1][j],
-        w,
-        sel ? (data.input[i] ? 0.65 : 0.18) : 0.035,
-        sel ? 1.4 : 0.6,
-      );
-    }),
+  const xs = [42, 174, 310, 446, 578];
+  const values = [
+    data.input,
+    ...data.layers.slice(0, -1).map((l) => l.output),
+    data.probabilities,
+  ];
+  const positions = values.map((column) =>
+    column.map((_, i) => 78 + (250 * i) / (column.length - 1)),
   );
-  state.model.w2.forEach((row, j) =>
-    row.forEach(
-      (w, i) =>
-        (lines += edge(
-          xs[1],
-          positions[1][i],
-          xs[2],
-          positions[2][j],
+  let lines = "";
+  state.model.layers.forEach((layer, l) =>
+    layer.weights.forEach((row, j) =>
+      row.forEach((w, i) => {
+        const selected =
+          (l === state.layer && j === state.selected) ||
+          (l === state.layer + 1 && i === state.selected);
+        lines += edge(
+          xs[l],
+          positions[l][i],
+          xs[l + 1],
+          positions[l + 1][j],
           w,
-          i === state.selected ? 0.5 : 0.045,
-          i === state.selected ? 1.4 : 0.7,
-        )),
+          selected ? (values[l][i] > 0 ? 0.7 : 0.24) : 0.055,
+          selected ? 1.5 : 0.6,
+        );
+      }),
     ),
   );
-  const nodes =
-    data.input
-      .map((v, i) => svgNode(xs[0], positions[0][i], 3.1, "", "", { level: v }))
-      .join("") +
-    data.hidden
-      .map((v, i) =>
-        svgNode(xs[1], positions[1][i], 6, "", "", {
-          level: v / hmax,
-          id: String(i),
-          selected: state.selected === i,
-        }),
-      )
-      .join("") +
-    data.probabilities
-      .map((v, i) =>
-        svgNode(xs[2], positions[2][i], 10, String(i), "", {
-          level: v,
-          small: true,
-        }),
-      )
-      .join("");
-  return `<svg class="network" viewBox="0 0 620 380" role="group" aria-label="Digit network with 35 pixel inputs, 16 hidden neurons and 10 outputs; selected neuron's connections highlighted"><text class="node-caption" x="72" y="40" text-anchor="middle">35 pixels</text><text class="node-caption" x="310" y="40" text-anchor="middle">16 hidden neurons</text><text class="node-caption" x="548" y="40" text-anchor="middle">10 digits</text>${lines}${nodes}<text class="node-caption" x="310" y="352" text-anchor="middle">Click a hidden neuron to trace its connections</text></svg>`;
+  const nodes = values
+    .map((column, l) => {
+      const max = Math.max(1, ...column);
+      return column
+        .map((v, i) =>
+          svgNode(
+            xs[l],
+            positions[l][i],
+            l === 0 ? 3 : l === 4 ? 10 : l === 1 ? 5.2 : 5.8,
+            l === 4 ? String(i) : "",
+            "",
+            {
+              level: v / max,
+              id: l > 0 && l < 4 ? `${l - 1}:${i}` : "",
+              ariaLabel: `Inspect layer ${l} neuron ${i + 1}`,
+              selected: l === state.layer + 1 && i === state.selected,
+              small: true,
+            },
+          ),
+        )
+        .join("");
+    })
+    .join("");
+  const labels = [
+    "35 pixels",
+    "Layer 1 · 24",
+    "Layer 2 · 16",
+    "Layer 3 · 12",
+    "10 digits",
+  ];
+  return `<svg class="network deep-network" viewBox="0 0 620 380" role="group" aria-label="Digit network with 35 inputs, three hidden layers of 24, 16 and 12 neurons, and 10 outputs"><rect class="layer-band" x="${xs[state.layer + 1] - 32}" y="55" width="64" height="288" rx="12"/>${labels.map((label, i) => `<text class="node-caption layer-heading" x="${xs[i]}" y="32" text-anchor="middle">${label}</text>${i > 0 && i < 4 ? `<text class="node-caption" x="${xs[i]}" y="48" text-anchor="middle">ReLU</text>` : ""}`).join("")}${lines}${nodes}<text class="node-caption" x="310" y="365" text-anchor="middle">Click a neuron in any hidden layer</text></svg>`;
 }
+
 function attachNeuronHandlers() {
   $$("[data-neuron]").forEach((node) => {
     const select = () => {
       const focusId = node.dataset.neuron;
-      state.selected = Number(focusId);
+      if (state.stage === 1) {
+        [state.layer, state.selected] = focusId.split(":").map(Number);
+      } else state.selected = Number(focusId);
       updateNetwork();
       $(`[data-neuron="${focusId}"]`)?.focus({ preventScroll: true });
     };
@@ -250,8 +264,26 @@ function binaryHTML() {
 }
 function digitsHTML() {
   if (!state.model)
-    return `<div class="workspace" style="display:block;padding:40px"><h3>${state.modelError ? "The digit model could not load." : "Loading the small digit model…"}</h3><p>${state.modelError ? "Check the connection and reload this page. The two-outcome network and language schematic are still available." : "746 weights and biases; inference stays on this device."}</p>${state.modelError ? '<button id="retry-model" class="secondary-button">Retry loading</button>' : ""}</div>`;
-  return `<div class="workspace digits-workspace fade-in"><aside class="input-panel"><p class="panel-label">01 / Input <span class="compact-count">5 × 7</span></p><div class="pixel-grid" role="group" aria-label="Editable 5 by 7 digit pixels">${state.pixels.map((v, i) => `<button class="pixel ${v ? "on" : ""}" data-pixel="${i}" aria-label="Pixel row ${Math.floor(i / 5) + 1}, column ${(i % 5) + 1}" aria-pressed="${Boolean(v)}"></button>`).join("")}</div><div class="digit-presets" aria-label="Choose an example digit">${digitPatterns.map((_, i) => `<button class="digit-preset ${state.digit === i ? "selected" : ""}" data-digit="${i}" aria-label="Load digit ${i}" aria-pressed="${state.digit === i}">${i}</button>`).join("")}</div><div class="input-tools"><button id="clear-pixels">Clear</button><button id="add-noise">Flip 3 pixels</button></div><p class="hint-box">Click or drag over pixels.<br>Every pixel is one number: 0 or 1.</p><span class="model-badge">Trained weights · live inference</span></aside><div class="network-panel"><div class="network-topline"><span>720 connections · 26 biases</span><div class="network-legend"><span><i></i> +</span><span><i class="negative"></i> −</span></div></div><div id="network-drawing"></div></div><aside class="output-panel"><p class="panel-label">03 / Prediction</p><div class="prediction"><span class="prediction-value" id="digit-result"></span></div><div class="probability-list" id="digit-probabilities" aria-live="polite"></div><p class="output-note" id="digit-note">Simple symbols, learned from examples.<br>A high probability can still be wrong.</p></aside></div><div class="trace"><div><p class="trace-title" id="trace-title"></p><p class="trace-copy">Same calculation. More inputs.<br>Weights learned by backpropagation.</p></div><div class="equation" id="trace-equation"></div><p class="scale-note"><strong>35 × 16 + 16<br>+ 16 × 10 + 10 = 746</strong><br>Every weight and bias counts.</p></div>`;
+    return `<div class="workspace" style="display:block;padding:40px"><h3>${state.modelError ? "The digit model could not load." : "Loading the small digit model…"}</h3><p>${state.modelError ? "Check the connection and reload this page. The two-outcome network and language schematic are still available." : "1,598 weights and biases; inference stays on this device."}</p>${state.modelError ? '<button id="retry-model" class="secondary-button">Retry loading</button>' : ""}</div>`;
+  return `<div class="workspace digits-workspace fade-in"><aside class="input-panel"><p class="panel-label">01 / Input <span class="compact-count">5 × 7</span></p><div class="pixel-grid" role="group" aria-label="Editable 5 by 7 digit pixels">${state.pixels.map((v, i) => `<button class="pixel ${v ? "on" : ""}" data-pixel="${i}" aria-label="Pixel row ${Math.floor(i / 5) + 1}, column ${(i % 5) + 1}" aria-pressed="${Boolean(v)}"></button>`).join("")}</div><div class="digit-presets" aria-label="Choose an example digit">${digitPatterns.map((_, i) => `<button class="digit-preset ${state.digit === i ? "selected" : ""}" data-digit="${i}" aria-label="Load digit ${i}" aria-pressed="${state.digit === i}">${i}</button>`).join("")}</div><div class="input-tools"><button id="clear-pixels">Clear</button><button id="add-noise">Flip 3 pixels</button></div><p class="hint-box">Click or drag over pixels.<br>Every pixel is one number: 0 or 1.</p><span class="model-badge">Trained weights · live inference</span></aside><div class="network-panel"><div class="network-topline"><span>1,536 connections · 62 biases</span><div class="network-legend"><span><i></i> +</span><span><i class="negative"></i> −</span></div></div><div id="network-drawing"></div><div class="layer-controls" role="group" aria-label="Inspect a hidden layer">${[24, 16, 12].map((n, l) => `<button data-layer="${l}" aria-pressed="${l === state.layer}"><span>Layer ${l + 1}</span><small>${n} neurons</small></button>`).join("")}</div><p class="layer-note">Each layer receives the previous layer’s outputs. Colors are scaled within each layer.</p><p class="mobile-diagram-hint">Scroll the diagram sideways to inspect all layers.</p></div><aside class="output-panel"><p class="panel-label">03 / Prediction</p><div class="prediction"><span class="prediction-value" id="digit-result"></span></div><div class="probability-list" id="digit-probabilities" aria-live="polite"></div><p class="output-note" id="digit-note">Simple symbols, learned from examples.<br>A high probability can still be wrong.</p></aside></div><div class="trace"><div><p class="trace-title" id="trace-title"></p><p class="trace-copy">Same calculation in every layer.<br>Weights learned by backpropagation.</p></div><div class="equation" id="trace-equation"></div><p class="scale-note"><strong>35 → 24 → 16 → 12 → 10</strong><br>3 hidden layers · 1,598 trained parameters</p></div>`;
+}
+function layerSketch() {
+  const columns = [4, 7, 4].map((n, l) =>
+    Array.from({ length: n }, (_, i) => ({
+      x: 12 + l * 74,
+      y: 8 + (44 * i) / (n - 1),
+    })),
+  );
+  let connections = "";
+  for (let l = 0; l < 2; l++)
+    for (const a of columns[l])
+      for (const b of columns[l + 1]) {
+        connections += `<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}"/>`;
+      }
+  return `<svg class="layer-sketch" viewBox="0 0 172 60" aria-hidden="true">${connections}${columns.flatMap((column) => column.map((p) => `<circle cx="${p.x}" cy="${p.y}" r="3.3"/>`)).join("")}</svg>`;
+}
+function transformerDepth() {
+  return `<div class="depth-strip" role="group" aria-label="Repeated transformer blocks">${[1, 2, 31, 32].map((n, i) => `${i === 2 ? '<span class="depth-gap" aria-label="28 intermediate blocks">⋯</span>' : i > 0 ? '<span class="depth-arrow" aria-hidden="true">→</span>' : ""}<button class="depth-block" data-block="${n}" aria-label="Inspect transformer block ${n}" aria-pressed="${n === state.block}"><strong>Block ${n}</strong><span class="depth-attention">Attention</span>${layerSketch()}</button>`).join("")}</div><p class="depth-caption">32 blocks in sequence · separate learned weights in every block</p>`;
 }
 function languageHTML() {
   const ex = languageExamples[state.country];
@@ -264,7 +296,7 @@ function languageHTML() {
     )
     .join(
       "",
-    )}</select><div class="token-list" id="token-list">${ex.tokens.map((t) => `<span class="token">${t}</span>`).join("")}<span class="token next-token">?</span></div><p class="hint-box">Text becomes tokens, then vectors of numbers.<br><br>Real tokens can be words, parts of words, or punctuation. These chunks are simplified.</p><span class="model-badge">Schematic · no LLM running</span></aside><div class="llm-network"><div class="llm-label"><span>Inside a decoder-only transformer</span><span class="illustration-tag">Values are illustrative</span></div><div class="transformer-flow"><div class="embedding-block">Token embeddings</div><span class="flow-arrow">→</span><div class="stack-wrap"><div class="transformer-block"><div class="block-heading">Transformer block <span>× 32</span></div><div class="block-core"><p class="normalization">NORM + POSITION IN ATTENTION</p><button class="block-part ${state.part === "attention" ? "active" : ""}" data-part="attention" aria-pressed="${state.part === "attention"}">Self-attention<small>Mix information across tokens</small></button><div class="block-plus">↓</div><p class="normalization">NORM</p><button class="block-part ${state.part === "feedforward" ? "active" : ""}" data-part="feedforward" aria-pressed="${state.part === "feedforward"}">Feed-forward network<small>Transform each token’s features</small></button><div class="block-plus">↓</div></div><p class="block-footer">+ residual paths around both sublayers</p></div></div><span class="flow-arrow">→</span><div class="head-block">Final norm → scores → softmax</div></div><div><div class="block-ticks" aria-label="32 repeated transformer blocks">${Array.from({ length: 32 }, (_, i) => `<i class="${i < 4 ? "lit" : ""}"></i>`).join("")}</div><p class="block-footer">32 blocks · 4,096 features per token · schematic, not to scale</p></div></div><aside class="output-panel"><p class="panel-label">03 / Next token</p><div class="prediction"><span class="prediction-value" id="language-result">${ex.next[0]}</span></div><div class="probability-list" id="language-probabilities">${probabilities(softmax(ex.scores), ex.next)}</div><p class="output-note">Four invented candidate scores, for illustration. Real models score the full vocabulary.</p><button id="language-step" class="primary-button">Step through the process →</button><div class="step-status" id="step-status">Click a block to look inside.</div></aside></div><div class="trace llm-trace" id="language-trace"></div>`;
+    )}</select><div class="token-list" id="token-list">${ex.tokens.map((t) => `<span class="token">${t}</span>`).join("")}<span class="token next-token">?</span></div><p class="hint-box">Text becomes tokens, then vectors of numbers.<br><br>Real tokens can be words, parts of words, or punctuation. These chunks are simplified.</p><span class="model-badge">Schematic · no LLM running</span></aside><div class="llm-network"><div class="llm-label"><span>Inside a decoder-only transformer</span><span class="illustration-tag">Values are illustrative</span></div><div class="transformer-flow"><div class="embedding-block">Token embeddings</div><span class="flow-arrow">→</span><div class="stack-wrap"><div class="transformer-block"><div class="block-heading"><span>Transformer block</span><strong id="selected-block">${state.block} / 32</strong></div><div class="block-core"><p class="normalization">NORM + POSITION IN ATTENTION</p><button class="block-part ${state.part === "attention" ? "active" : ""}" data-part="attention" aria-pressed="${state.part === "attention"}">Self-attention<small>Mix information across tokens</small></button><div class="block-plus">↓</div><p class="normalization">NORM</p><button class="block-part ${state.part === "feedforward" ? "active" : ""}" data-part="feedforward" aria-pressed="${state.part === "feedforward"}">Feed-forward network${layerSketch()}<small>Two projections + SwiGLU gate</small><small class="ffn-width">4,096 → wider → 4,096 features</small></button><div class="block-plus">↓</div></div><p class="block-footer">+ residual paths around both sublayers</p></div></div><span class="flow-arrow">→</span><div class="head-block">Final norm → scores → softmax</div></div>${transformerDepth()}</div><aside class="output-panel"><p class="panel-label">03 / Next token</p><div class="prediction"><span class="prediction-value" id="language-result">${ex.next[0]}</span></div><div class="probability-list" id="language-probabilities">${probabilities(softmax(ex.scores), ex.next)}</div><p class="output-note">Four invented candidate scores, for illustration. Real models score the full vocabulary.</p><button id="language-step" class="primary-button">Step through the process →</button><div class="step-status" id="step-status">Click a block to look inside.</div></aside></div><div class="trace llm-trace" id="language-trace"></div>`;
 }
 function renderStage(index, fromTour = false) {
   if (!fromTour && tour.playing) pauseTour();
@@ -274,6 +306,7 @@ function renderStage(index, fromTour = false) {
   }
   state.stage = index;
   state.selected = 0;
+  state.layer = 0;
   const s = stages[index];
   $("#stage-kicker").textContent = s.kicker;
   $("#stage-title").textContent = s.title;
@@ -308,6 +341,22 @@ function renderStage(index, fromTour = false) {
     });
     updateNetwork();
   } else if (index === 1 && state.model) {
+    $$("[data-layer]").forEach((button) =>
+      button.addEventListener("click", () => {
+        state.layer = Number(button.dataset.layer);
+        const activations = denseForward(state.pixels, state.model).layers[
+          state.layer
+        ].output;
+        state.selected = activations.indexOf(Math.max(...activations));
+        updateNetwork();
+        const drawing = $("#network-drawing");
+        const x = ([174, 310, 446][state.layer] / 620) * drawing.scrollWidth;
+        drawing.scrollTo({
+          left: x - drawing.clientWidth / 2,
+          behavior: "instant",
+        });
+      }),
+    );
     $$("[data-digit]").forEach((b) =>
       b.addEventListener("click", () => setDigit(Number(b.dataset.digit))),
     );
@@ -384,6 +433,13 @@ function renderStage(index, fromTour = false) {
         renderLanguageTrace();
       }),
     );
+    $$("[data-block]").forEach((button) =>
+      button.addEventListener("click", () => {
+        state.block = Number(button.dataset.block);
+        state.part = "feedforward";
+        renderLanguageTrace();
+      }),
+    );
     $("#language-step").addEventListener("click", languageStep);
     renderLanguageTrace();
   }
@@ -442,10 +498,18 @@ function updateNetwork() {
       ? "Blank input: there is no digit. The network still assigns probabilities to its ten classes."
       : "Trained on simple synthetic symbols. A high probability can still be wrong.";
     const h = state.selected;
-    const sum = d.pre[h] - state.model.b1[h];
-    $("#trace-title").textContent = `Inside hidden neuron ${h + 1}`;
+    const layer = state.model.layers[state.layer];
+    const trace = d.layers[state.layer];
+    const sum = trace.pre[h] - layer.biases[h];
+    $("#trace-title").textContent =
+      `Layer ${state.layer + 1} · neuron ${h + 1}`;
     $("#trace-equation").innerHTML =
-      `ReLU(Σ pixelᵢ × weightᵢ + bias)<br>= ReLU(${fmt(sum)} ${state.model.b1[h] >= 0 ? "+" : "−"} ${fmt(Math.abs(state.model.b1[h]))}) = <b>${fmt(d.hidden[h])}</b><small>35 weighted pixel values + one bias. Connections are highlighted above.</small>`;
+      `<span>ReLU(Σ inputᵢ × weightᵢ + bias)</span><br>≈ ReLU(${fmt(sum)} ${layer.biases[h] >= 0 ? "+" : "−"} ${fmt(Math.abs(layer.biases[h]))}) ≈ <b>${fmt(trace.output[h])}</b><small>${state.layer === 0 ? "Inputs: 35 pixel values." : `Inputs: ${trace.input.length} activations from layer ${state.layer}.`} <span>The highlighted connections belong to this neuron.</span></small>`;
+    $$("[data-layer]").forEach((button) => {
+      const selected = Number(button.dataset.layer) === state.layer;
+      button.classList.toggle("selected", selected);
+      button.setAttribute("aria-pressed", selected);
+    });
   }
   attachNeuronHandlers();
 }
@@ -460,13 +524,20 @@ function renderLanguageTrace() {
     b.classList.toggle("active", b.dataset.part === state.part);
     b.setAttribute("aria-pressed", b.dataset.part === state.part);
   });
+  $("#selected-block").textContent = `${state.block} / 32`;
+  $$("[data-block]").forEach((button) =>
+    button.setAttribute(
+      "aria-pressed",
+      Number(button.dataset.block) === state.block,
+    ),
+  );
   const ex = languageExamples[state.country];
   if (state.part === "attention") {
     $("#language-trace").innerHTML =
       `<div><p class="trace-title">Context integration through attention</p><p class="trace-copy">An illustrative attention row for “is”.<br>Tokens can mix information from earlier tokens and themselves.</p></div><div class="attention-weights">${ex.tokens.map((t, i) => `<div class="attention-word ${i === 3 ? "strongest" : ""}"><div class="attention-track"><div class="attention-fill" style="height:${ex.attention[i] * 100}%"></div></div><span>${t}</span><small>${Math.round(ex.attention[i] * 100)}%</small></div>`).join("")}</div><p class="scale-note"><strong>softmax(QKᵀ / √d + M) V</strong><br>Q, K, V are learned projections. M masks future tokens. Displayed values are illustrative.</p>`;
   } else {
     $("#language-trace").innerHTML =
-      `<div><p class="trace-title">Feed-forward sublayer</p><p class="trace-copy">Each token passes through the same feed-forward network.</p></div><div><div class="feedforward-mini"><span class="mini-layer">${"<i></i>".repeat(9)}</span><span>→</span><span class="mini-layer">${"<i></i>".repeat(18)}</span><span>→</span><span class="mini-layer">${"<i></i>".repeat(9)}</span><span>Weighted transforms<br>+ a nonlinearity</span></div><p class="trace-copy" style="margin-top:9px">Llama uses a gated nonlinearity (SwiGLU), not the small demo’s ReLU.</p></div><p class="scale-note"><strong>Shared computational building blocks.</strong><br>More features, more layers, and learned representations make full explanations harder.</p>`;
+      `<div><p class="trace-title">Feed-forward sublayer</p><p class="trace-copy">Each token passes through the same feed-forward network.</p></div><div><div class="feedforward-mini"><div class="ffn-detail">${layerSketch()}<div class="ffn-labels"><span>Input</span><span>Gated features</span><span>Output</span></div></div></div><p class="trace-copy" style="margin-top:9px">Two learned projections are combined by a SwiGLU gate, then projected back. Sketch: a few representative features, not individual model neurons.</p></div><p class="scale-note"><strong>Shared computational building blocks.</strong><br>Digits: 3 hidden layers, 1,598 parameters. Llama 3 8B: 32 blocks, about 8 billion parameters — roughly 5 million times as many.</p>`;
   }
 }
 const stepDescriptions = [
@@ -491,9 +562,7 @@ function languageStep() {
     $("#token-list").innerHTML =
       ex.tokens.map((t) => `<span class="token">${t}</span>`).join("") +
       `<span class="token">${ex.next[0]}</span><span class="token next-token">?</span>`;
-  $$(".block-ticks i").forEach((el, i) =>
-    el.classList.toggle("lit", i < (step >= 2 ? 32 : step === 1 ? 16 : 4)),
-  );
+  state.block = step >= 2 ? 32 : step === 1 ? 2 : 1;
   $("#language-step").textContent =
     step === 3 ? "Replay the process ↺" : "Next step →";
   state.step++;
@@ -552,20 +621,29 @@ const storyEvents = [
   {
     at: 31,
     caption:
-      "Thirty-five pixels pass through sixteen hidden neurons to ten output scores.",
-    action: () => setDigit(3),
+      "Thirty-five pixels pass through three hidden layers: 24, 16, then 12 neurons. Each layer passes its outputs to the next.",
+    action: () => {
+      state.layer = 1;
+      state.selected = 0;
+      setDigit(3);
+    },
   },
   {
     at: 37,
     caption:
       "The weights were learned from examples. Change the pattern and the prediction changes.",
-    action: () => setDigit(8),
+    action: () => {
+      state.layer = 2;
+      state.selected = 0;
+      setDigit(8);
+    },
   },
   {
     at: 43,
     caption:
-      "More connections, same arithmetic. These 746 parameters remain small enough to inspect.",
+      "Three hidden layers repeat the same calculation. Each of the 1,598 parameters contributes to the prediction.",
     action: () => {
+      state.layer = 2;
       state.selected = 8;
       updateNetwork();
     },
@@ -579,6 +657,7 @@ const storyEvents = [
       state.country = "France";
       state.step = 0;
       state.part = "attention";
+      state.block = 1;
     },
   },
   {

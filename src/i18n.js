@@ -1,6 +1,47 @@
 // English source strings remain the stable keys. Only presentation text changes:
 // model inputs, select values, equations' numerical values, and timing stay intact.
 const german = {
+  "1,598": "1.598",
+  "1,598 parameters": "1.598 Parameter",
+  "35 → 24 → 16 → 12 → 10 neurons": "35 → 24 → 16 → 12 → 10 Neuronen",
+  "1,598 weights and biases; inference stays on this device.":
+    "1.598 Gewichte und Bias-Werte; die Berechnung bleibt auf diesem Gerät.",
+  "1,536 connections · 62 biases": "1.536 Verbindungen · 62 Bias-Werte",
+  "Inspect a hidden layer": "Eine verdeckte Schicht untersuchen",
+  "Digit network with 35 inputs, three hidden layers of 24, 16 and 12 neurons, and 10 outputs":
+    "Ziffernnetz mit 35 Eingängen, drei verdeckten Schichten aus 24, 16 und 12 Neuronen sowie 10 Ausgängen",
+  "Click a neuron in any hidden layer":
+    "Klicke auf ein Neuron in einer verdeckten Schicht",
+  "Each layer receives the previous layer’s outputs. Colors are scaled within each layer.":
+    "Jede Schicht erhält die Ausgaben der vorherigen Schicht. Die Farbskala gilt jeweils innerhalb einer Schicht.",
+  "Scroll the diagram sideways to inspect all layers.":
+    "Das Diagramm seitlich verschieben, um alle Schichten zu sehen.",
+  "Same calculation in every layer.": "Gleiche Rechnung in jeder Schicht.",
+  "3 hidden layers · 1,598 trained parameters":
+    "3 verdeckte Schichten · 1.598 trainierte Parameter",
+  "ReLU(Σ inputᵢ × weightᵢ + bias)": "ReLU(Σ Eingabeᵢ × Gewichtᵢ + Bias)",
+  "Inputs: 35 pixel values.": "Eingaben: 35 Pixelwerte.",
+  "The highlighted connections belong to this neuron.":
+    "Die hervorgehobenen Verbindungen gehören zu diesem Neuron.",
+  "Repeated transformer blocks": "Aufeinanderfolgende Transformer-Blöcke",
+  "28 intermediate blocks": "28 dazwischenliegende Blöcke",
+  "32 blocks in sequence · separate learned weights in every block":
+    "32 Blöcke nacheinander · eigene gelernte Gewichte in jedem Block",
+  "Two projections + SwiGLU gate": "Zwei Projektionen + SwiGLU-Gate",
+  "4,096 → wider → 4,096 features": "4.096 → breiter → 4.096 Merkmale",
+  Input: "Eingabe",
+  "Gated features": "Merkmale nach Gating",
+  Output: "Ausgabe",
+  "Two learned projections are combined by a SwiGLU gate, then projected back. Sketch: a few representative features, not individual model neurons.":
+    "Zwei gelernte Projektionen werden durch ein SwiGLU-Gate verknüpft und zurückprojiziert. Skizze: wenige stellvertretende Merkmale, keine einzelnen Modellneuronen.",
+  "Digits: 3 hidden layers, 1,598 parameters. Llama 3 8B: 32 blocks, about 8 billion parameters — roughly 5 million times as many.":
+    "Ziffernnetz: 3 verdeckte Schichten, 1.598 Parameter. Llama 3 8B: 32 Blöcke, etwa 8 Milliarden Parameter – ungefähr 5 Millionen Mal so viele.",
+  "Thirty-five pixels pass through three hidden layers: 24, 16, then 12 neurons. Each layer passes its outputs to the next.":
+    "35 Pixel durchlaufen drei verdeckte Schichten mit 24, 16 und 12 Neuronen. Jede Schicht gibt ihre Ausgaben an die nächste weiter.",
+  "Three hidden layers repeat the same calculation. Each of the 1,598 parameters contributes to the prediction.":
+    "Drei verdeckte Schichten wiederholen dieselbe Rechnung. Jeder der 1.598 Parameter fließt in die Vorhersage ein.",
+  "A 35 → 24 → 16 → 12 → 10 network has three ReLU hidden layers and 1,598 parameters. It was trained with backpropagation and stochastic gradient descent on ten original 5 × 7 bitmap patterns with random pixel flips. Inference runs in your browser. These are simple synthetic symbols, not MNIST or arbitrary handwriting. The network must choose among ten digits even for nonsense input; a high output probability does not prove that it is right.":
+    "Ein 35 → 24 → 16 → 12 → 10-Netz hat drei verdeckte ReLU-Schichten und 1.598 Parameter. Es wurde mit Backpropagation und stochastischem Gradientenabstieg auf zehn selbst erstellten 5 × 7-Pixelmustern mit zufällig gekippten Pixeln trainiert. Die Vorhersage läuft in deinem Browser. Es handelt sich um einfache synthetische Symbole, nicht um MNIST oder beliebige Handschrift. Selbst bei unsinnigen Eingaben muss das Netz zwischen zehn Ziffern wählen; eine hohe Ausgabewahrscheinlichkeit beweist nicht, dass die Vorhersage stimmt.",
   "CC BY-SA 4.0": "CC BY-SA 4.0",
   "Guided sequence paused. Resume to return to the current step in the sequence.":
     "Geführter Ablauf pausiert. Beim Fortsetzen kehrt die Ansicht zum aktuellen Schritt des Ablaufs zurück.",
@@ -45,9 +86,6 @@ const german = {
   "02 / DIGIT CLASSIFICATION": "02 / ZIFFERNKLASSIFIKATION",
   "Digit classification from pixel inputs":
     "Ziffernklassifikation aus Pixeleingaben",
-  "746 parameters": "746 Parameter",
-  "35 inputs → 16 hidden → 10 outputs":
-    "35 Eingänge → 16 verdeckte Neuronen → 10 Ausgänge",
   "Weights now come from training.":
     "Die Gewichte stammen jetzt aus dem Training.",
   "03 / TRANSFORMER ARCHITECTURE": "03 / TRANSFORMER-ARCHITEKTUR",
@@ -92,10 +130,7 @@ const german = {
   OUTPUT: "AUSGABE",
   "Fully connected neural network with two inputs, two hidden neurons and two output probabilities":
     "Vollständig verbundenes Netz mit zwei Eingängen, zwei verdeckten Neuronen und zwei Ausgabewahrscheinlichkeiten",
-  "Digit network with 35 pixel inputs, 16 hidden neurons and 10 outputs; selected neuron's connections highlighted":
-    "Ziffernnetz mit 35 Pixeleingängen, 16 verdeckten Neuronen und 10 Ausgängen; die Verbindungen des ausgewählten Neurons sind hervorgehoben",
   "35 pixels": "35 Pixel",
-  "16 hidden neurons": "16 verdeckte Neuronen",
   "10 digits": "10 Ziffern",
   "Click a hidden neuron to trace its connections":
     "Klicke auf ein verdecktes Neuron, um seine Verbindungen zu verfolgen",
@@ -104,8 +139,6 @@ const german = {
   "Loading the small digit model…": "Das kleine Ziffernmodell wird geladen …",
   "Check the connection and reload this page. The two-outcome network and language schematic are still available.":
     "Prüfe die Verbindung und lade die Seite neu. Das Netz mit zwei Ausgängen und das Sprachmodell-Schema bleiben verfügbar.",
-  "746 weights and biases; inference stays on this device.":
-    "746 Gewichte und Bias-Werte; die Berechnung bleibt auf diesem Gerät.",
   "Retry loading": "Erneut laden",
   "Editable 5 by 7 digit pixels": "Bearbeitbare Ziffer aus 5 mal 7 Pixeln",
   "Choose an example digit": "Eine Beispielziffer auswählen",
@@ -114,7 +147,6 @@ const german = {
   "Click or drag over pixels.": "Pixel anklicken oder darüberziehen.",
   "Every pixel is one number: 0 or 1.": "Jeder Pixel ist eine Zahl: 0 oder 1.",
   "Trained weights · live inference": "Trainierte Gewichte · live berechnet",
-  "720 connections · 26 biases": "720 Verbindungen · 26 Bias-Werte",
   "03 / Prediction": "03 / Vorhersage",
   "Simple symbols, learned from examples.":
     "Einfache Symbole, aus Beispielen gelernt.",
@@ -207,12 +239,8 @@ const german = {
     "Jetzt ist nur Schalter B an. Das andere verdeckte Neuron wird aktiv. Die ganze Entscheidung lässt sich nachvollziehen.",
   "A digit is a grid of numbers. This small trained network uses exactly the same kinds of operations.":
     "Eine Ziffer ist ein Raster aus Zahlen. Das kleine trainierte Netz verwendet dieselben Arten von Rechenschritten.",
-  "Thirty-five pixels pass through sixteen hidden neurons to ten output scores.":
-    "35 Pixel fließen durch 16 verdeckte Neuronen zu zehn Ausgabewerten.",
   "The weights were learned from examples. Change the pattern and the prediction changes.":
     "Die Gewichte wurden aus Beispielen gelernt. Ändert sich das Muster, ändert sich die Vorhersage.",
-  "More connections, same arithmetic. These 746 parameters remain small enough to inspect.":
-    "Mehr Verbindungen, gleiche Rechenschritte. Diese 746 Parameter lassen sich noch einzeln untersuchen.",
   "A language model also transforms numbers with learned weights — at a vastly larger scale.":
     "Auch ein Sprachmodell verarbeitet Zahlen mit gelernten Gewichten – in einem enorm größeren Maßstab.",
   "Transformers add attention: tokens mix information from their context. These values are illustrative.":
@@ -261,8 +289,6 @@ const german = {
     "Ein 2 → 2 → 2-Netz löst das exklusive Oder (XOR): Die Ausgabe ist AN, wenn genau ein Schalter eingeschaltet ist. Seine zwölf Gewichte und Bias-Werte wurden von Hand festgelegt. Die verdeckte Schicht nutzt ReLU; Softmax wandelt die beiden Ausgabewerte in Wahrscheinlichkeiten um. Der Gewichtsregler verändert die tatsächliche Rechnung. Die Wahrscheinlichkeiten sind keine kalibrierten Konfidenzschätzungen.",
   "02 · Ten digits — actual trained inference":
     "02 · Zehn Ziffern – echte Vorhersagen eines trainierten Netzes",
-  "A 35 → 16 → 10 network has 746 parameters. It was trained with backpropagation and stochastic gradient descent on ten original 5 × 7 bitmap patterns with random pixel flips. Inference runs in your browser. These are simple synthetic symbols, not MNIST or arbitrary handwriting. The network must choose among ten digits even for nonsense input; a high output probability does not prove that it is right.":
-    "Ein 35 → 16 → 10-Netz hat 746 Parameter. Es wurde mit Backpropagation und stochastischem Gradientenabstieg auf zehn selbst erstellten 5 × 7-Pixelmustern mit zufällig gekippten Pixeln trainiert. Die Vorhersage läuft in deinem Browser. Es handelt sich um einfache synthetische Symbole, nicht um MNIST oder beliebige Handschrift. Selbst bei unsinnigen Eingaben muss das Netz zwischen zehn Ziffern wählen; eine hohe Ausgabewahrscheinlichkeit beweist nicht, dass die Vorhersage stimmt.",
   "03 · A language model — an architecture illustration":
     "03 · Ein Sprachmodell – eine Darstellung der Architektur",
   "The scale reference is Llama 3 8B: 32 transformer blocks and 4,096 features per token. The prompt chunks, attention values, and four-way next-token probabilities are authored illustrations, not outputs or tokenizer results from Llama. No language model is loaded. A real model scores its entire token vocabulary.":
@@ -302,6 +328,25 @@ export function translateText(value, language) {
   let result = german[key];
   if (result === undefined) {
     const rules = [
+      [
+        /^Inspect layer (\d+) neuron (\d+)$/,
+        (_, l, n) => `Schicht ${l}, Neuron ${n} untersuchen`,
+      ],
+      [
+        /^Layer (\d+) · neuron (\d+)$/,
+        (_, l, n) => `Schicht ${l} · Neuron ${n}`,
+      ],
+      [/^Layer (\d+)( · \d+)?$/, (_, l, count) => `Schicht ${l}${count || ""}`],
+      [/^(\d+) neurons$/, (_, n) => `${n} Neuronen`],
+      [
+        /^Inputs: (\d+) activations from layer (\d+)\.$/,
+        (_, n, l) => `Eingaben: ${n} Aktivierungen aus Schicht ${l}.`,
+      ],
+      [
+        /^Inspect transformer block (\d+)$/,
+        (_, n) => `Transformer-Block ${n} untersuchen`,
+      ],
+
       [/^Switch ([AB])$/, (_, n) => `Schalter ${n}`],
       [
         /^Inspect hidden neuron (\d+)$/,

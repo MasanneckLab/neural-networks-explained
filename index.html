@@ -97,7 +97,7 @@
           <span class="chapter-number">02</span
           ><span
             ><strong>Ten digits</strong><small>Recognize a pattern</small></span
-          ><span class="chapter-count">746</span>
+          ><span class="chapter-count">1,598</span>
         </button>
         <button class="chapter" data-stage="2">
           <span class="chapter-number">03</span
@@ -248,13 +248,13 @@
       <div class="about-section">
         <h3>02 · Ten digits — actual trained inference</h3>
         <p>
-          A 35 → 16 → 10 network has 746 parameters. It was trained with
-          backpropagation and stochastic gradient descent on ten original 5 × 7
-          bitmap patterns with random pixel flips. Inference runs in your
-          browser. These are simple synthetic symbols, not MNIST or arbitrary
-          handwriting. The network must choose among ten digits even for
-          nonsense input; a high output probability does not prove that it is
-          right.
+          A 35 → 24 → 16 → 12 → 10 network has three ReLU hidden layers and
+          1,598 parameters. It was trained with backpropagation and stochastic
+          gradient descent on ten original 5 × 7 bitmap patterns with random
+          pixel flips. Inference runs in your browser. These are simple
+          synthetic symbols, not MNIST or arbitrary handwriting. The network
+          must choose among ten digits even for nonsense input; a high output
+          probability does not prove that it is right.
         </p>
         <p id="evaluation-note"></p>
       </div>

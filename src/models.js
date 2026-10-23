@@ -16,22 +16,46 @@ export function binaryForward(a, b, weight = 1) {
   return { input: [a, b], pre, hidden, logits, probabilities: softmax(logits) };
 }
 export function denseForward(input, model) {
-  const pre = model.w1.map((row, j) =>
-    row.reduce((s, w, i) => s + w * input[i], model.b1[j]),
-  );
-  const hidden = pre.map(relu);
-  const logits = model.w2.map((row, j) =>
-    row.reduce((s, w, i) => s + w * hidden[i], model.b2[j]),
-  );
-  return { input, pre, hidden, logits, probabilities: softmax(logits) };
+  let values = input;
+  const layers = model.layers.map(({ weights, biases }, index) => {
+    const layerInput = values;
+    const pre = weights.map((row, j) =>
+      row.reduce((sum, w, i) => sum + w * layerInput[i], biases[j]),
+    );
+    values = index === model.layers.length - 1 ? pre : pre.map(relu);
+    return { input: layerInput, pre, output: values };
+  });
+  return { input, layers, logits: values, probabilities: softmax(values) };
 }
 export function parameterCount(model) {
-  return (
-    model.w1.flat().length +
-    model.b1.length +
-    model.w2.flat().length +
-    model.b2.length
+  return model.layers.reduce(
+    (sum, layer) => sum + layer.weights.flat().length + layer.biases.length,
+    0,
   );
+}
+
+// Cross-entropy gradients are computed for every layer before weights are changed.
+export function denseGradients(input, model, label) {
+  const forward = denseForward(input, model);
+  let delta = forward.probabilities.map((p, j) => p - Number(j === label));
+  const gradients = Array(model.layers.length);
+  for (let l = model.layers.length - 1; l >= 0; l--) {
+    gradients[l] = {
+      weights: delta.map((d) => forward.layers[l].input.map((x) => d * x)),
+      biases: [...delta],
+    };
+    if (l > 0) {
+      delta = forward.layers[l - 1].pre.map((v, i) =>
+        v > 0
+          ? delta.reduce(
+              (sum, d, j) => sum + d * model.layers[l].weights[j][i],
+              0,
+            )
+          : 0,
+      );
+    }
+  }
+  return gradients;
 }
 export function seededRandom(seed) {
   return () => {

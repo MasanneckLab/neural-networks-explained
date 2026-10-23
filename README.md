@@ -21,11 +21,11 @@ Keyboard: **← / →** or **1 / 2 / 3** switch chapters; **Space** plays or pau
 
 ## What is real?
 
-| Chapter          | Network                            |                       Parameters | What the page actually does                                                                                                                                           |
-| ---------------- | ---------------------------------- | -------------------------------: | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Two outcomes     | 2 → 2 → 2, ReLU, softmax           |                               12 | Computes XOR with hand-set weights. Switches and weight editing run actual arithmetic. Hidden activations, logits, and softmax can be inspected.                      |
-| Ten digits       | 35 → 16 → 10, ReLU, softmax        |                              746 | Runs a trained classifier locally on editable 5 × 7 bitmap inputs. Shows all 720 connections and highlights those of a selected hidden neuron.                        |
-| A language model | Decoder-only transformer schematic | ~8 billion, Llama 3 8B reference | Illustrates embeddings, attention, feed-forward layers, residual connections, normalization, repeated blocks, and next-token selection. No LLM is loaded or executed. |
+| Chapter          | Network                               |                       Parameters | What the page actually does                                                                                                                                           |
+| ---------------- | ------------------------------------- | -------------------------------: | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Two outcomes     | 2 → 2 → 2, ReLU, softmax              |                               12 | Computes XOR with hand-set weights. Switches and weight editing run actual arithmetic. Hidden activations, logits, and softmax can be inspected.                      |
+| Ten digits       | 35 → 24 → 16 → 12 → 10, ReLU, softmax |                            1,598 | Runs a trained classifier locally on editable 5 × 7 bitmap inputs. Shows all 1,536 connections and highlights those of a selected hidden neuron.                      |
+| A language model | Decoder-only transformer schematic    | ~8 billion, Llama 3 8B reference | Illustrates embeddings, attention, feed-forward layers, residual connections, normalization, repeated blocks, and next-token selection. No LLM is loaded or executed. |
 
 The common idea is learned weighted computation and nonlinear transformation. A transformer is **not merely a wider multilayer perceptron**: attention mixes information across tokens, and other architectural components matter. Knowing the arithmetic or architecture does not fully explain a model's learned behavior. Even small learned networks do not automatically have human-interpretable hidden features.
 
@@ -45,13 +45,15 @@ The slider replaces the first `a` coefficient with a chosen weight. The paramete
 
 ### Digit network: provenance and limits
 
+Every hidden layer is shown explicitly. Click a neuron or a layer selector to inspect its actual weighted sum, bias, and activation; later layers receive the preceding layer’s activations. Node colors are normalized separately within each layer.
+
 The ten bitmap templates in `src/models.js` are original synthetic symbols. Training uses on-the-fly independent 7% pixel flips of these same templates. There is no external dataset and no MNIST dependency.
 
-- Architecture: 35 inputs, 16 ReLU hidden units, 10 softmax outputs.
-- Parameters: `35*16 + 16 + 16*10 + 10 = 746`.
+- Architecture: 35 inputs, three ReLU hidden layers with 24, 16, and 12 neurons, 10 softmax outputs.
+- Parameters: `35*24 + 24 + 24*16 + 16 + 16*12 + 12 + 12*10 + 10 = 1598`.
 - Optimizer: stochastic gradient descent, cross-entropy loss, 80,000 updates; learning rate decreases from 0.025 toward 0.00375.
 - Training seed: `20261022`; evaluation seed: `571932`.
-- Check: all ten clean symbols are classified correctly; **1,985/2,000 (99.25%)** fresh noisy versions of the same ten templates are correct.
+- Check: all ten clean symbols are classified correctly; **1,986/2,000 (99.3%)** fresh noisy versions of the same ten templates are correct.
 - This is a within-template synthetic robustness check. It is **not independent validation on new symbol styles, real handwriting, or people**.
 - The classifier always distributes probability across its ten classes. It has no learned rejection class. A high score on an arbitrary drawing can be wrong. The UI flags blank input rather than presenting it as a meaningful recognized digit, while still showing the model's numerical outputs.
 
@@ -60,6 +62,8 @@ The ten bitmap templates in `src/models.js` are original synthetic symbols. Trai
 ### Transformer schematic: provenance and limits
 
 The scale reference is **Meta Llama 3 8B (2024)**: 32 transformer blocks and 4,096 features per token. It is a concrete reference, not a claim about every LLM or the latest model.
+
+The block sequence shows blocks 1, 2, 31 and 32, with the 28 intervening blocks elided. Selecting a block changes the architectural focus, not measured activations. Each block contains its own learned attention and feed-forward weights. The feed-forward sketches use representative circles and connections; the wider middle column abstracts two learned projections combined by a SwiGLU gate, followed by a projection back to 4,096 features. It is not a literal diagram of individual Llama neurons. The comparison of ~8 billion to 1,598 parameters is approximately five million-fold; transformer blocks and individual dense layers are distinct units.
 
 The prompt chunks are simplified and do not reproduce Llama tokenization. Attention distributions and candidate logits are explicitly authored in `languageExamples`; only their four-way softmax normalization is computed. They are **not measured model outputs or attention explanations**. A real model scores its entire vocabulary, uses many attention heads, and repeats a much richer computation. The schematic compresses normalization, positional operations, and residual paths. Llama uses SwiGLU feed-forward layers rather than this demo's ReLU. No Llama weights or source code are bundled.
 

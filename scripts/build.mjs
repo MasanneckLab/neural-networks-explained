@@ -11,10 +11,27 @@ const styleVersion = createHash("sha256")
   .update(await readFile("src/styles.css"))
   .digest("hex")
   .slice(0, 12);
-const html = (await readFile("index.html", "utf8")).replace(
-  './src/styles.css"',
-  `./src/styles.css?v=${styleVersion}"`,
-);
+// Keep inference code, translations, and weights in sync for returning visitors.
+const modelVersion = createHash("sha256");
+for (const file of [
+  "src/app.js",
+  "src/models.js",
+  "src/i18n.js",
+  "public/assets/digit-model.json",
+])
+  modelVersion.update(await readFile(file));
+const moduleVersion = modelVersion.digest("hex").slice(0, 12);
+const app = (await readFile("src/app.js", "utf8"))
+  .replace('"./models.js"', `"./models.js?v=${moduleVersion}"`)
+  .replace('"./i18n.js"', `"./i18n.js?v=${moduleVersion}"`)
+  .replace(
+    '"../assets/digit-model.json"',
+    `"../assets/digit-model.json?v=${moduleVersion}"`,
+  );
+await writeFile("dist/src/app.js", app);
+const html = (await readFile("index.html", "utf8"))
+  .replace('./src/styles.css"', `./src/styles.css?v=${styleVersion}"`)
+  .replace('./src/app.js"', `./src/app.js?v=${moduleVersion}"`);
 await writeFile("dist/index.html", html);
 await writeFile("dist/.nojekyll", "");
 await QRCode.toFile("dist/assets/lecture-qr.png", url, {

@@ -2183,3 +2183,270 @@ html[lang="de"] .llm-trace .feedforward-mini {
     font-size: 9px;
   }
 }
+
+/* The digit and transformer diagrams share a visible layer vocabulary. */
+.deep-network .layer-band {
+  fill: var(--teal-light);
+  opacity: 0.65;
+}
+.digits-workspace .network .layer-heading {
+  font-weight: 700;
+  fill: var(--ink);
+  font-size: 13px;
+}
+.digits-workspace .network {
+  height: 305px;
+}
+.layer-controls {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 0 10px;
+}
+.layer-controls button {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  color: var(--muted);
+  padding: 7px 14px;
+  font-size: 11px;
+  min-width: 90px;
+}
+.layer-controls button small {
+  display: block;
+  margin-top: 3px;
+  font-size: 9px;
+}
+.layer-controls button.selected {
+  background: var(--teal-light);
+  border-color: var(--teal);
+  color: var(--teal);
+}
+.layer-note {
+  margin: 9px 10px 0;
+  font-size: 9px;
+  line-height: 1.5;
+  color: var(--muted);
+  text-align: center;
+}
+.mobile-diagram-hint {
+  display: none;
+}
+.layer-sketch {
+  display: block;
+  width: 100%;
+  height: 51px;
+  color: var(--teal);
+}
+.layer-sketch line {
+  stroke: currentColor;
+  opacity: 0.25;
+  stroke-width: 0.75;
+}
+.layer-sketch circle {
+  fill: var(--paper);
+  stroke: currentColor;
+  stroke-width: 1.2;
+}
+.block-part.active .layer-sketch {
+  color: white;
+}
+.block-part.active .layer-sketch circle {
+  fill: var(--teal);
+}
+.block-part .layer-sketch {
+  margin: 4px 0;
+  height: 44px;
+}
+.block-part .ffn-width {
+  font-size: 8px;
+}
+.block-heading span {
+  font: inherit;
+  color: inherit;
+}
+.depth-strip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+.depth-block {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  padding: 5px 8px;
+  color: var(--teal);
+  width: 77px;
+}
+.depth-block strong {
+  display: block;
+  font-size: 10px;
+}
+.depth-attention {
+  display: block;
+  border-bottom: 1px solid var(--line);
+  margin: 4px 0 3px;
+  font-size: 8px;
+  color: var(--muted);
+}
+.depth-block .layer-sketch {
+  height: 22px;
+}
+.depth-block[aria-pressed="true"] {
+  background: var(--teal-light);
+  border-color: var(--teal);
+  box-shadow: 0 0 0 1px var(--teal);
+}
+.depth-arrow,
+.depth-gap {
+  color: var(--muted);
+}
+.depth-caption {
+  text-align: center;
+  color: var(--muted);
+  font-size: 9px;
+  line-height: 1.4;
+  margin: 7px 0 0;
+}
+.ffn-detail {
+  width: 100%;
+  max-width: 340px;
+  margin: auto;
+}
+.ffn-detail .layer-sketch {
+  height: 58px;
+}
+.ffn-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+}
+.llm-trace .scale-note {
+  font-size: 10px;
+}
+@media (max-width: 1100px) {
+  .depth-strip {
+    gap: 4px;
+  }
+  .depth-block {
+    width: 65px;
+    padding: 5px;
+  }
+  .layer-controls button {
+    min-width: 75px;
+    padding: 6px 9px;
+  }
+}
+@media (max-width: 800px) {
+  .digits-workspace {
+    grid-template-columns: 1fr;
+  }
+  .mobile-diagram-hint {
+    display: block;
+    margin: 6px 10px 0;
+    color: var(--muted);
+    font-size: 9px;
+    text-align: center;
+  }
+  .digits-workspace .input-panel {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 8px 20px;
+    border-bottom: 1px solid var(--line);
+  }
+  .digits-workspace .input-panel .panel-label {
+    grid-column: 1/-1;
+  }
+  .digits-workspace .pixel-grid {
+    grid-column: 1;
+    grid-row: 2/6;
+    width: 128px;
+  }
+  .digits-workspace .digit-presets,
+  .digits-workspace .input-tools,
+  .digits-workspace .hint-box,
+  .digits-workspace .model-badge {
+    grid-column: 2;
+  }
+  .digits-workspace #network-drawing {
+    overflow-x: auto;
+  }
+  .digits-workspace .deep-network {
+    min-width: 500px;
+    width: 100%;
+    height: 305px;
+  }
+  .digits-workspace .network-panel {
+    padding-top: 30px;
+    padding-bottom: 16px;
+  }
+  .depth-strip {
+    gap: 5px;
+  }
+  .depth-block {
+    width: 62px;
+    padding: 5px;
+  }
+}
+@media (max-width: 520px) {
+  .digits-workspace .input-panel {
+    grid-template-columns: 1fr 1fr;
+  }
+  .layer-controls {
+    gap: 6px;
+    margin: 0;
+  }
+  .layer-controls button {
+    flex: 1;
+    min-width: 0;
+  }
+  .depth-strip {
+    gap: 4px;
+  }
+  .depth-block {
+    width: 60px;
+  }
+  .depth-block strong {
+    font-size: 9px;
+  }
+  .depth-attention {
+    font-size: 7px;
+  }
+  .block-part .ffn-width {
+    font-size: 8px;
+    line-height: 1.4;
+  }
+}
+@media (min-width: 1101px) and (max-height: 950px) {
+  .presenting .llm-network {
+    gap: 6px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+  .presenting .transformer-block {
+    padding: 10px;
+  }
+  .presenting .block-core {
+    padding-top: 6px;
+  }
+  .presenting .block-part {
+    padding-top: 6px;
+    padding-bottom: 6px;
+  }
+  .presenting .block-part .layer-sketch {
+    height: 34px;
+  }
+  .presenting .normalization {
+    margin-top: 3px;
+    margin-bottom: 3px;
+  }
+  .presenting .block-plus {
+    padding-top: 1px;
+    padding-bottom: 1px;
+  }
+  .presenting .depth-block .layer-sketch {
+    height: 16px;
+  }
+  .presenting .depth-attention {
+    margin: 2px 0;
+  }
+}

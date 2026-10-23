@@ -37,6 +37,19 @@ test("localization preserves numerical values and uses the appropriate decimal s
 
 test("dynamic accessible labels and evaluation limits are translated", () => {
   assert.equal(
+    translateText("Inspect layer 3 neuron 12", "de"),
+    "Schicht 3, Neuron 12 untersuchen",
+  );
+  assert.equal(
+    translateText("Layer 2 · neuron 5", "de"),
+    "Schicht 2 · Neuron 5",
+  );
+  assert.equal(
+    translateText("Inputs: 24 activations from layer 1.", "de"),
+    "Eingaben: 24 Aktivierungen aus Schicht 1.",
+  );
+  assert.equal(translateText("1,598 parameters", "de"), "1.598 Parameter");
+  assert.equal(
     translateText("Pixel row 7, column 5", "de"),
     "Pixel in Zeile 7, Spalte 5",
   );
