@@ -1,0 +1,17 @@
+{
+  "name": "neural-networks-explained",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "An interactive lecture on neural networks, from two outcomes to a transformer.",
+  "scripts": {
+    "dev": "node scripts/serve.mjs",
+    "build": "node scripts/build.mjs",
+    "train": "node scripts/train.mjs",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "devDependencies": {
+    "qrcode": "1.5.4"
+  },
+  "engines": {"node": ">=20"}
+}
