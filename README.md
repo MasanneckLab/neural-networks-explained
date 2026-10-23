@@ -15,10 +15,10 @@ Keyboard: **← / →** or **1 / 2 / 3** switch chapters; **Space** plays or pau
 
 ## What is real?
 
-| Chapter | Network | Parameters | What the page actually does |
-| --- | --- | ---: | --- |
-| Two outcomes | 2 → 2 → 2, ReLU, softmax | 12 | Computes XOR with hand-set weights. Switches and weight editing run actual arithmetic. Hidden activations, logits, and softmax can be inspected. |
-| Ten digits | 35 → 16 → 10, ReLU, softmax | 746 | Runs a trained classifier locally on editable 5 × 7 bitmap inputs. Shows all 720 connections and highlights those of a selected hidden neuron. |
+| Chapter          | Network                            |                       Parameters | What the page actually does                                                                                                                                           |
+| ---------------- | ---------------------------------- | -------------------------------: | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Two outcomes     | 2 → 2 → 2, ReLU, softmax           |                               12 | Computes XOR with hand-set weights. Switches and weight editing run actual arithmetic. Hidden activations, logits, and softmax can be inspected.                      |
+| Ten digits       | 35 → 16 → 10, ReLU, softmax        |                              746 | Runs a trained classifier locally on editable 5 × 7 bitmap inputs. Shows all 720 connections and highlights those of a selected hidden neuron.                        |
 | A language model | Decoder-only transformer schematic | ~8 billion, Llama 3 8B reference | Illustrates embeddings, attention, feed-forward layers, residual connections, normalization, repeated blocks, and next-token selection. No LLM is loaded or executed. |
 
 The common idea is learned weighted computation and nonlinear transformation. A transformer is **not merely a wider multilayer perceptron**: attention mixes information across tokens, and other architectural components matter. Knowing the arithmetic or architecture does not fully explain a model's learned behavior. Even small learned networks do not automatically have human-interpretable hidden features.

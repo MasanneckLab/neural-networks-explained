@@ -13,5 +13,7 @@
   "devDependencies": {
     "qrcode": "1.5.4"
   },
-  "engines": {"node": ">=20"}
+  "engines": {
+    "node": ">=20"
+  }
 }

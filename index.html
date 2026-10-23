@@ -1,54 +1,278 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f5f4ef">
-  <meta name="description" content="An interactive journey from a tiny neural network to a large language model. See the calculations, edit pixels, and explore a transformer.">
-  <meta property="og:title" content="Neural networks, unpacked · MasanneckLab">
-  <meta property="og:description" content="Two outcomes. Ten digits. Billions of parameters. Explore the common building blocks.">
-  <title>Neural networks, unpacked · MasanneckLab</title>
-  <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="./src/styles.css">
-</head>
-<body>
-  <a class="skip-link" href="#experiment">Skip to interactive demo</a>
-  <header class="topbar">
-    <a class="brand" href="#small" aria-label="MasanneckLab neural network demo"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path d="M6 7L24 15L6 23M6 7V23" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="6" cy="7" r="3"/><circle cx="6" cy="23" r="3"/><circle cx="24" cy="15" r="3"/></svg><span>Masanneck<span class="brand-light">Lab</span></span></a>
-    <span class="topbar-label">AN INTERACTIVE FIELD GUIDE</span>
-    <div class="top-actions"><button id="present" class="quiet-button">⛶ <span>Present</span></button><button id="share" class="quiet-button">↗ <span>Share / QR</span></button><a class="source-link" href="https://github.com/MasanneckLab/neural-networks-explained" target="_blank" rel="noopener noreferrer" aria-label="View source on GitHub">GitHub ↗</a></div>
-  </header>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f5f4ef" />
+    <meta
+      name="description"
+      content="An interactive journey from a tiny neural network to a large language model. See the calculations, edit pixels, and explore a transformer."
+    />
+    <meta
+      property="og:title"
+      content="Neural networks, unpacked · MasanneckLab"
+    />
+    <meta
+      property="og:description"
+      content="Two outcomes. Ten digits. Billions of parameters. Explore the common building blocks."
+    />
+    <title>Neural networks, unpacked · MasanneckLab</title>
+    <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./src/styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#experiment">Skip to interactive demo</a>
+    <header class="topbar">
+      <a
+        class="brand"
+        href="#small"
+        aria-label="MasanneckLab neural network demo"
+        ><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true">
+          <path
+            d="M6 7L24 15L6 23M6 7V23"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+          />
+          <circle cx="6" cy="7" r="3" />
+          <circle cx="6" cy="23" r="3" />
+          <circle cx="24" cy="15" r="3" /></svg
+        ><span>Masanneck<span class="brand-light">Lab</span></span></a
+      >
+      <span class="topbar-label">AN INTERACTIVE FIELD GUIDE</span>
+      <div class="top-actions">
+        <button id="present" class="quiet-button">⛶ <span>Present</span></button
+        ><button id="share" class="quiet-button">
+          ↗ <span>Share / QR</span></button
+        ><a
+          class="source-link"
+          href="https://github.com/MasanneckLab/neural-networks-explained"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="View source on GitHub"
+          >GitHub ↗</a
+        >
+      </div>
+    </header>
 
-  <main>
-    <section class="intro" aria-labelledby="page-title">
-      <div><p class="eyebrow">NEURAL NETWORKS, UNPACKED</p><h1 id="page-title">Simple operations.<span> Extraordinary scale.</span></h1><p class="intro-copy">Follow a signal from a tiny decision to a language model.</p></div>
-      <button id="play-story" class="primary-button"><span id="play-icon">▶</span> <span id="play-label">Play the 75-second story</span></button>
-    </section>
+    <main>
+      <section class="intro" aria-labelledby="page-title">
+        <div>
+          <p class="eyebrow">NEURAL NETWORKS, UNPACKED</p>
+          <h1 id="page-title">
+            Simple operations.<span> Extraordinary scale.</span>
+          </h1>
+          <p class="intro-copy">
+            Follow a signal from a tiny decision to a language model.
+          </p>
+        </div>
+        <button id="play-story" class="primary-button">
+          <span id="play-icon">▶</span>
+          <span id="play-label">Play the 75-second story</span>
+        </button>
+      </section>
 
-    <nav class="chapters" aria-label="Choose a network">
-      <button class="chapter active" data-stage="0" aria-current="step"><span class="chapter-number">01</span><span><strong>Two outcomes</strong><small>Trace every calculation</small></span><span class="chapter-count">12</span></button>
-      <button class="chapter" data-stage="1"><span class="chapter-number">02</span><span><strong>Ten digits</strong><small>Recognize a pattern</small></span><span class="chapter-count">746</span></button>
-      <button class="chapter" data-stage="2"><span class="chapter-number">03</span><span><strong>A language model</strong><small>Connect the building blocks</small></span><span class="chapter-count">~8B</span></button>
-    </nav>
+      <nav class="chapters" aria-label="Choose a network">
+        <button class="chapter active" data-stage="0" aria-current="step">
+          <span class="chapter-number">01</span
+          ><span
+            ><strong>Two outcomes</strong
+            ><small>Trace every calculation</small></span
+          ><span class="chapter-count">12</span>
+        </button>
+        <button class="chapter" data-stage="1">
+          <span class="chapter-number">02</span
+          ><span
+            ><strong>Ten digits</strong><small>Recognize a pattern</small></span
+          ><span class="chapter-count">746</span>
+        </button>
+        <button class="chapter" data-stage="2">
+          <span class="chapter-number">03</span
+          ><span
+            ><strong>A language model</strong
+            ><small>Connect the building blocks</small></span
+          ><span class="chapter-count">~8B</span>
+        </button>
+      </nav>
 
-    <section id="experiment" aria-labelledby="stage-title" tabindex="-1">
-      <div class="stage-heading"><div><p class="eyebrow" id="stage-kicker"></p><h2 id="stage-title"></h2></div><div class="parameter-label"><strong id="parameter-count"></strong><span id="parameter-description"></span></div></div>
-      <div id="stage-content"></div>
-    </section>
+      <section id="experiment" aria-labelledby="stage-title" tabindex="-1">
+        <div class="stage-heading">
+          <div>
+            <p class="eyebrow" id="stage-kicker"></p>
+            <h2 id="stage-title"></h2>
+          </div>
+          <div class="parameter-label">
+            <strong id="parameter-count"></strong
+            ><span id="parameter-description"></span>
+          </div>
+        </div>
+        <div id="stage-content"></div>
+      </section>
 
-    <section class="common-thread" aria-label="Shared building blocks">
-      <div><span class="thread-dot"></span><strong>The common thread</strong></div><p><span>Multiply by weights</span><b>→</b><span>Add & transform</span><b>→</b><span>Pass it forward</span></p><span class="thread-note" id="thread-note">A neuron is a small calculation.</span>
-    </section>
+      <section class="common-thread" aria-label="Shared building blocks">
+        <div>
+          <span class="thread-dot"></span><strong>The common thread</strong>
+        </div>
+        <p>
+          <span>Multiply by weights</span><b>→</b><span>Add & transform</span
+          ><b>→</b><span>Pass it forward</span>
+        </p>
+        <span class="thread-note" id="thread-note"
+          >A neuron is a small calculation.</span
+        >
+      </section>
 
-    <div class="story-strip" id="story-strip" hidden><div class="story-progress" id="story-progress"></div><span class="story-label">GUIDED STORY</span><p id="story-caption" aria-live="polite"></p><span id="story-time">0:00 / 1:15</span><button id="restart-story" class="text-button" aria-label="Restart story">↺</button><button id="end-story" class="text-button" aria-label="End story">×</button></div>
+      <div class="story-strip" id="story-strip" hidden>
+        <div class="story-progress" id="story-progress"></div>
+        <span class="story-label">GUIDED STORY</span>
+        <p id="story-caption" aria-live="polite"></p>
+        <span id="story-time">0:00 / 1:15</span
+        ><button
+          id="restart-story"
+          class="text-button"
+          aria-label="Restart story"
+        >
+          ↺</button
+        ><button id="end-story" class="text-button" aria-label="End story">
+          ×
+        </button>
+      </div>
 
-    <footer><p>Built for curiosity. <button id="about" class="text-button">What is real in this demo?</button></p><p class="keyboard-hint"><kbd>←</kbd> <kbd>→</kbd> explore <span>·</span> <kbd>space</kbd> play / pause</p><div><button id="previous" class="nav-arrow" aria-label="Previous chapter">←</button><button id="next" class="nav-arrow" aria-label="Next chapter">→</button></div></footer>
-  </main>
+      <footer>
+        <p>
+          Built for curiosity.
+          <button id="about" class="text-button">
+            What is real in this demo?
+          </button>
+        </p>
+        <p class="keyboard-hint">
+          <kbd>←</kbd> <kbd>→</kbd> explore <span>·</span> <kbd>space</kbd> play
+          / pause
+        </p>
+        <div>
+          <button id="previous" class="nav-arrow" aria-label="Previous chapter">
+            ←</button
+          ><button id="next" class="nav-arrow" aria-label="Next chapter">
+            →
+          </button>
+        </div>
+      </footer>
+    </main>
 
-  <dialog id="share-dialog" aria-labelledby="share-title"><button class="dialog-close" data-close aria-label="Close share dialog">×</button><p class="eyebrow">TAKE THE IDEA WITH YOU</p><h2 id="share-title">A small link to a big idea.</h2><img class="qr-image" src="./assets/lecture-qr.svg" alt="QR code for the public neural networks demo" width="256" height="256"><p class="share-address">masannecklab.github.io/<br>neural-networks-explained/</p><div class="share-actions"><button id="copy-link" class="primary-button">Copy link</button><a class="secondary-button" download="neural-networks-lecture-qr.png" href="./assets/lecture-qr.png">Download QR</a></div><p class="fine-print">Open on a phone. No account, API key, or installation.</p></dialog>
+    <dialog id="share-dialog" aria-labelledby="share-title">
+      <button class="dialog-close" data-close aria-label="Close share dialog">
+        ×
+      </button>
+      <p class="eyebrow">TAKE THE IDEA WITH YOU</p>
+      <h2 id="share-title">A small link to a big idea.</h2>
+      <img
+        class="qr-image"
+        src="./assets/lecture-qr.svg"
+        alt="QR code for the public neural networks demo"
+        width="256"
+        height="256"
+      />
+      <p class="share-address">
+        masannecklab.github.io/<br />neural-networks-explained/
+      </p>
+      <div class="share-actions">
+        <button id="copy-link" class="primary-button">Copy link</button
+        ><a
+          class="secondary-button"
+          download="neural-networks-lecture-qr.png"
+          href="./assets/lecture-qr.png"
+          >Download QR</a
+        >
+      </div>
+      <p class="fine-print">
+        Open on a phone. No account, API key, or installation.
+      </p>
+    </dialog>
 
-  <dialog id="about-dialog" aria-labelledby="about-title"><button class="dialog-close" data-close aria-label="Close explanation">×</button><p class="eyebrow">A NOTE ON THE MODELS</p><h2 id="about-title">Simple enough to inspect.<br>Honest about the limits.</h2><div class="about-section"><h3>01 · Two outcomes — actual arithmetic</h3><p>A 2 → 2 → 2 network solves exclusive OR (XOR): the output is ON when exactly one switch is on. Its 12 weights and biases were set by hand. The hidden layer uses ReLU; the two output scores become probabilities with softmax. Moving the weight slider changes the actual calculation. The probability values are not calibrated confidence estimates.</p></div><div class="about-section"><h3>02 · Ten digits — actual trained inference</h3><p>A 35 → 16 → 10 network has 746 parameters. It was trained with backpropagation and stochastic gradient descent on ten original 5 × 7 bitmap patterns with random pixel flips. Inference runs in your browser. These are simple synthetic symbols, not MNIST or arbitrary handwriting. The network must choose among ten digits even for nonsense input; a high output probability does not prove that it is right.</p><p id="evaluation-note"></p></div><div class="about-section"><h3>03 · A language model — an architecture illustration</h3><p>The scale reference is Llama 3 8B: 32 transformer blocks and 4,096 features per token. The prompt chunks, attention values, and four-way next-token probabilities are authored illustrations, not outputs or tokenizer results from Llama. No language model is loaded. A real model scores its entire token vocabulary.</p><p>Transformers share learned weighted operations and nonlinear feed-forward networks with smaller neural nets, and add attention, residual connections, normalization, and positional information. The diagram compresses these operations. Knowing the architecture is not the same as explaining every learned behavior. Attention weights alone are not a faithful explanation of a model’s decision.</p></div><div class="about-section"><h3>Read further</h3><p><a href="https://arxiv.org/abs/1706.03762" target="_blank" rel="noopener noreferrer">Vaswani et al. · Attention Is All You Need (2017) ↗</a><br><a href="https://github.com/meta-llama/llama3/blob/main/llama/model.py" target="_blank" rel="noopener noreferrer">Meta · Llama 3 reference architecture ↗</a><br><a href="https://github.com/meta-llama/llama3/blob/main/MODEL_CARD.md" target="_blank" rel="noopener noreferrer">Meta · Llama 3 model card ↗</a></p></div><p class="fine-print">No analytics, external fonts, or remote inference. All interactive calculations stay on your device.</p></dialog>
-  <noscript><p class="noscript">This interactive guide needs JavaScript. You can still read its explanation in the <a href="https://github.com/MasanneckLab/neural-networks-explained">GitHub repository</a>.</p></noscript>
-  <script type="module" src="./src/app.js"></script>
-</body>
+    <dialog id="about-dialog" aria-labelledby="about-title">
+      <button class="dialog-close" data-close aria-label="Close explanation">
+        ×
+      </button>
+      <p class="eyebrow">A NOTE ON THE MODELS</p>
+      <h2 id="about-title">
+        Simple enough to inspect.<br />Honest about the limits.
+      </h2>
+      <div class="about-section">
+        <h3>01 · Two outcomes — actual arithmetic</h3>
+        <p>
+          A 2 → 2 → 2 network solves exclusive OR (XOR): the output is ON when
+          exactly one switch is on. Its 12 weights and biases were set by hand.
+          The hidden layer uses ReLU; the two output scores become probabilities
+          with softmax. Moving the weight slider changes the actual calculation.
+          The probability values are not calibrated confidence estimates.
+        </p>
+      </div>
+      <div class="about-section">
+        <h3>02 · Ten digits — actual trained inference</h3>
+        <p>
+          A 35 → 16 → 10 network has 746 parameters. It was trained with
+          backpropagation and stochastic gradient descent on ten original 5 × 7
+          bitmap patterns with random pixel flips. Inference runs in your
+          browser. These are simple synthetic symbols, not MNIST or arbitrary
+          handwriting. The network must choose among ten digits even for
+          nonsense input; a high output probability does not prove that it is
+          right.
+        </p>
+        <p id="evaluation-note"></p>
+      </div>
+      <div class="about-section">
+        <h3>03 · A language model — an architecture illustration</h3>
+        <p>
+          The scale reference is Llama 3 8B: 32 transformer blocks and 4,096
+          features per token. The prompt chunks, attention values, and four-way
+          next-token probabilities are authored illustrations, not outputs or
+          tokenizer results from Llama. No language model is loaded. A real
+          model scores its entire token vocabulary.
+        </p>
+        <p>
+          Transformers share learned weighted operations and nonlinear
+          feed-forward networks with smaller neural nets, and add attention,
+          residual connections, normalization, and positional information. The
+          diagram compresses these operations. Knowing the architecture is not
+          the same as explaining every learned behavior. Attention weights alone
+          are not a faithful explanation of a model’s decision.
+        </p>
+      </div>
+      <div class="about-section">
+        <h3>Read further</h3>
+        <p>
+          <a
+            href="https://arxiv.org/abs/1706.03762"
+            target="_blank"
+            rel="noopener noreferrer"
+            >Vaswani et al. · Attention Is All You Need (2017) ↗</a
+          ><br /><a
+            href="https://github.com/meta-llama/llama3/blob/main/llama/model.py"
+            target="_blank"
+            rel="noopener noreferrer"
+            >Meta · Llama 3 reference architecture ↗</a
+          ><br /><a
+            href="https://github.com/meta-llama/llama3/blob/main/MODEL_CARD.md"
+            target="_blank"
+            rel="noopener noreferrer"
+            >Meta · Llama 3 model card ↗</a
+          >
+        </p>
+      </div>
+      <p class="fine-print">
+        No analytics, external fonts, or remote inference. All interactive
+        calculations stay on your device.
+      </p>
+    </dialog>
+    <noscript
+      ><p class="noscript">
+        This interactive guide needs JavaScript. You can still read its
+        explanation in the
+        <a href="https://github.com/MasanneckLab/neural-networks-explained"
+          >GitHub repository</a
+        >.
+      </p></noscript
+    >
+    <script type="module" src="./src/app.js"></script>
+  </body>
 </html>
