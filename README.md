@@ -73,6 +73,14 @@ References:
 - [Meta's Llama 3 reference implementation](https://github.com/meta-llama/llama3/blob/main/llama/model.py): architecture defaults and transformer sublayers.
 - [Meta's Llama 3 model card](https://github.com/meta-llama/llama3/blob/main/MODEL_CARD.md): 8B and 70B model families and model context.
 
+## Animated information flow
+
+Gold markers and outlines follow the same sequence in all three chapters: inputs, successive transformations, and output probabilities. Flow starts automatically unless the browser requests reduced motion. Use **Pause flow**, **Replay flow** (↺), or **Next flow step** (→) for a recording or explanation. Switching language preserves the current animation position. Changing inputs restarts the flow with the newly computed activations. Pausing the guided tour freezes its signal animation too.
+
+The small network animates connections carrying nonzero source activations. The digit view animates the two largest absolute weighted input contributions per destination neuron, to keep the graph legible; every connection still participates in inference. Node colors show actual activations. Gold marks the processing stage, not activation magnitude, causality, or feature importance. Biases still contribute when inputs are zero. Outputs are computed immediately and stay visible; the animation replays the computation for teaching.
+
+The transformer animation is entirely schematic: embeddings, attention, the gated feed-forward sketch, successive blocks (with blocks 3–30 compressed), and the vocabulary/output head. Its timing is deliberately slowed and does not measure inference latency. The 75-second guided tour coordinates its captions with these stages. Reduced-motion mode uses discrete highlights without moving markers; automatic flow pauses when the tab becomes hidden.
+
 ## Local use
 
 Requires Node.js 20 or newer. This is a static HTML/CSS/JavaScript site, with no runtime framework, account, analytics, external fonts, or inference API. QR generation is a build-time dependency; the deployed browser needs no package CDN.
@@ -99,6 +107,7 @@ index.html                 Page shell, dialogs, model explanations
 src/app.js                 Interactive diagrams, input handling, timed story
 src/i18n.js                German/English text and state-preserving language switching
 src/models.js              Inference functions, bitmap templates, illustrative LLM values
+src/signal-flow.js         Shared animation clock, layer steps, tour synchronization
 src/styles.css             Responsive layout and presentation mode
 public/assets/             Original model weights and favicon
 scripts/train.mjs          Reproducible synthetic digit training and evaluation

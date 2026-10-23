@@ -1,6 +1,39 @@
 // English source strings remain the stable keys. Only presentation text changes:
 // model inputs, select values, equations' numerical values, and timing stay intact.
 const german = {
+  "Gold marks information flow, not activation strength. Moving dots show selected connections; all connections contribute to the result.":
+    "Gold markiert den Informationsfluss, nicht die Aktivierungsstärke. Bewegte Punkte zeigen ausgewählte Verbindungen; alle Verbindungen fließen in das Ergebnis ein.",
+  "Information flow animation": "Animation des Informationsflusses",
+  "Pause flow": "Fluss pausieren",
+  "Play flow": "Fluss starten",
+  "Replay flow": "Fluss wiederholen",
+  "Next flow step": "Nächster Verarbeitungsschritt",
+  "Next flow step →": "Nächster Verarbeitungsschritt →",
+  "Illustrative timing": "Schematischer Zeitablauf",
+  "Input values": "Eingabewerte",
+  "Weighted sum + ReLU": "Gewichtete Summe + ReLU",
+  "Output scores → probabilities": "Ausgabewerte → Wahrscheinlichkeiten",
+  "35 input pixels": "35 Eingabepixel",
+  "Hidden layer 1 · 24 neurons": "Verdeckte Schicht 1 · 24 Neuronen",
+  "Hidden layer 2 · 16 neurons": "Verdeckte Schicht 2 · 16 Neuronen",
+  "Hidden layer 3 · 12 neurons": "Verdeckte Schicht 3 · 12 Neuronen",
+  "10 output probabilities": "10 Ausgabewahrscheinlichkeiten",
+  "Tokens → embeddings": "Tokens → Embeddings",
+  "Block 1 · attention mixes context":
+    "Block 1 · Attention verknüpft den Kontext",
+  "Block 1 · projections + gate": "Block 1 · Projektionen + Gate",
+  "Block 1 · projection back": "Block 1 · Rückprojektion",
+  "Block 2 · attention + feed-forward": "Block 2 · Attention + Feed-forward",
+  "Blocks 3–30 · same sequence, different weights":
+    "Blöcke 3–30 · gleicher Ablauf, andere Gewichte",
+  "Block 31 · attention + feed-forward": "Block 31 · Attention + Feed-forward",
+  "Block 32 · attention + feed-forward": "Block 32 · Attention + Feed-forward",
+  "Final norm → vocabulary scores":
+    "Abschließende Normierung → Vokabular-Scores",
+  "Probabilities for the next token":
+    "Wahrscheinlichkeiten für das nächste Token",
+  "Animated schematic · no LLM inference":
+    "Animiertes Schema · keine LLM-Berechnung",
   "1,598": "1.598",
   "1,598 parameters": "1.598 Parameter",
   "35 → 24 → 16 → 12 → 10 neurons": "35 → 24 → 16 → 12 → 10 Neuronen",

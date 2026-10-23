@@ -1,3 +1,4 @@
+import { createSignalFlow } from "./signal-flow.js";
 import { initializeLanguage } from "./i18n.js";
 import {
   binaryForward,
@@ -55,7 +56,6 @@ const state = {
   digit: 7,
   country: "France",
   part: "attention",
-  step: 0,
   model: null,
   modelError: false,
   present: false,
@@ -69,6 +69,21 @@ const tour = {
   raf: null,
 };
 const content = $("#stage-content");
+const signalFlow = createSignalFlow((stage, phase) => {
+  if (stage !== 2) return;
+  state.block = phase < 4 ? 1 : phase < 6 ? 2 : phase === 6 ? 31 : 32;
+  state.part = phase < 2 ? "attention" : "feedforward";
+  renderLanguageTrace();
+  if (phase === 0 || phase === 9) {
+    const ex = languageExamples[state.country];
+    $("#token-list").innerHTML =
+      ex.tokens.map((t) => `<span class="token">${t}</span>`).join("") +
+      (phase === 9
+        ? `<span class="token illustrated-token">${ex.next[0]}</span>`
+        : "") +
+      '<span class="token next-token">?</span>';
+  }
+});
 
 function probabilities(p, labels) {
   const max = Math.max(...p);
@@ -88,12 +103,13 @@ function svgNode(x, y, r, value, label, options = {}) {
     level = 0,
     small = false,
     ariaLabel = "",
+    flowLayer = 0,
   } = options;
   const fill =
     level > 0.05
       ? `color-mix(in srgb, #8eb69a ${Math.min(75, level * 65)}%, #fffefa)`
       : "#fffefa";
-  return `<g class="${id ? "node" : ""} ${selected ? "selected" : ""}" ${id ? `data-neuron="${id}" role="button" tabindex="0" aria-label="${ariaLabel || `Inspect hidden neuron ${Number(id) + 1}`}"` : ""}><circle cx="${x}" cy="${y}" r="${r}" fill="${fill}" stroke="${level > 0.05 ? colors.teal : "#afbeb1"}" stroke-width="${selected ? 3 : 1.4}"/>${value !== "" ? `<text class="node-text" x="${x}" y="${y + 5}" text-anchor="middle" style="font-size:${small ? 9 : 16}px">${value}</text>` : ""}${label ? `<text class="node-caption" x="${x}" y="${y + r + 18}" text-anchor="middle">${label}</text>` : ""}</g>`;
+  return `<g data-flow-node="${flowLayer}" class="${id ? "node" : ""} ${selected ? "selected" : ""}" ${id ? `data-neuron="${id}" role="button" tabindex="0" aria-label="${ariaLabel || `Inspect hidden neuron ${Number(id) + 1}`}"` : ""}><circle cx="${x}" cy="${y}" r="${r}" fill="${fill}" stroke="${level > 0.05 ? colors.teal : "#afbeb1"}" stroke-width="${selected ? 3 : 1.4}"/>${value !== "" ? `<text class="node-text" x="${x}" y="${y + 5}" text-anchor="middle" style="font-size:${small ? 9 : 16}px">${value}</text>` : ""}${label ? `<text class="node-caption" x="${x}" y="${y + r + 18}" text-anchor="middle">${label}</text>` : ""}</g>`;
 }
 function edge(
   x1,
@@ -109,7 +125,7 @@ function edge(
 ) {
   const color = w >= 0 ? colors.teal : colors.orange;
   const path = `M${x1} ${y1}L${x2} ${y2}`;
-  return `<path class="edge" d="${path}" fill="none" stroke="${color}" stroke-width="${width}" opacity="${opacity}" ${w < 0 ? 'stroke-dasharray="4 3"' : ""}/>${label ? `<text class="weight-text" x="${x1 + (x2 - x1) * 0.32}" y="${y1 + (y2 - y1) * 0.32 - 8}" text-anchor="middle">${w > 0 ? "+" : ""}${Number.isInteger(w) ? w : fmt(w)}</text>` : ""}${flow ? `<circle r="3" class="signal" style="fill:${color}"><animateMotion dur="4s" begin="${phase}s" repeatCount="indefinite" path="${path}" keyPoints="0;0;1;1" keyTimes="0;0.1;0.45;1" calcMode="linear"/><animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;0.1;0.42;0.45;1" dur="4s" begin="${phase}s" repeatCount="indefinite"/></circle>` : ""}`;
+  return `<path class="edge" d="${path}" fill="none" stroke="${color}" stroke-width="${width}" opacity="${opacity}" ${w < 0 ? 'stroke-dasharray="4 3"' : ""}/>${label ? `<text class="weight-text" x="${x1 + (x2 - x1) * 0.32}" y="${y1 + (y2 - y1) * 0.32 - 8}" text-anchor="middle">${w > 0 ? "+" : ""}${Number.isInteger(w) ? w : fmt(w)}</text>` : ""}${flow ? `<circle r="3.4" class="flow-signal" data-flow-edge="${phase}" data-path="${x1},${y1},${x2},${y2}" cx="${x1}" cy="${y1}"/>` : ""}`;
 }
 function neuralSvg(data, large = false) {
   if (!large) {
@@ -145,7 +161,7 @@ function neuralSvg(data, large = false) {
           1.7,
           true,
           Boolean(data.hidden[i]),
-          1.4,
+          1,
         );
     const nodes =
       data.input
@@ -159,6 +175,7 @@ function neuralSvg(data, large = false) {
         .map((v, i) =>
           svgNode(xs[1], ys[i], 26, fmt(v), `h${i ? "₂" : "₁"} · ReLU`, {
             level: v,
+            flowLayer: 1,
             id: String(i),
             selected: state.selected === i,
           }),
@@ -172,7 +189,7 @@ function neuralSvg(data, large = false) {
             29,
             (100 * v).toFixed(0) + "%",
             i ? "ON" : "OFF",
-            { level: v },
+            { level: v, flowLayer: 2 },
           ),
         )
         .join("");
@@ -189,7 +206,13 @@ function neuralSvg(data, large = false) {
   );
   let lines = "";
   state.model.layers.forEach((layer, l) =>
-    layer.weights.forEach((row, j) =>
+    layer.weights.forEach((row, j) => {
+      const strongest = row
+        .map((w, i) => ({ i, contribution: Math.abs(w * values[l][i]) }))
+        .filter((v) => v.contribution > 0)
+        .sort((a, b) => b.contribution - a.contribution)
+        .slice(0, 2)
+        .map((v) => v.i);
       row.forEach((w, i) => {
         const selected =
           (l === state.layer && j === state.selected) ||
@@ -202,9 +225,12 @@ function neuralSvg(data, large = false) {
           w,
           selected ? (values[l][i] > 0 ? 0.7 : 0.24) : 0.055,
           selected ? 1.5 : 0.6,
+          false,
+          strongest.includes(i),
+          l,
         );
-      }),
-    ),
+      });
+    }),
   );
   const nodes = values
     .map((column, l) => {
@@ -218,6 +244,7 @@ function neuralSvg(data, large = false) {
             l === 4 ? String(i) : "",
             "",
             {
+              flowLayer: l,
               level: v / max,
               id: l > 0 && l < 4 ? `${l - 1}:${i}` : "",
               ariaLabel: `Inspect layer ${l} neuron ${i + 1}`,
@@ -280,14 +307,20 @@ function layerSketch() {
       for (const b of columns[l + 1]) {
         connections += `<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}"/>`;
       }
-  return `<svg class="layer-sketch" viewBox="0 0 172 60" aria-hidden="true">${connections}${columns.flatMap((column) => column.map((p) => `<circle cx="${p.x}" cy="${p.y}" r="3.3"/>`)).join("")}</svg>`;
+  let pulses = "";
+  for (let l = 0; l < 2; l++)
+    columns[l + 1].forEach((b, i) => {
+      const a = columns[l][i % columns[l].length];
+      pulses += `<circle class="flow-signal" r="2.6" data-sketch-edge="${l}" data-path="${a.x},${a.y},${b.x},${b.y}"/>`;
+    });
+  return `<svg class="layer-sketch" viewBox="0 0 172 60" aria-hidden="true">${connections}${pulses}${columns.flatMap((column, l) => column.map((p) => `<circle data-sketch-node="${l}" cx="${p.x}" cy="${p.y}" r="3.3"/>`)).join("")}</svg>`;
 }
 function transformerDepth() {
   return `<div class="depth-strip" role="group" aria-label="Repeated transformer blocks">${[1, 2, 31, 32].map((n, i) => `${i === 2 ? '<span class="depth-gap" aria-label="28 intermediate blocks">⋯</span>' : i > 0 ? '<span class="depth-arrow" aria-hidden="true">→</span>' : ""}<button class="depth-block" data-block="${n}" aria-label="Inspect transformer block ${n}" aria-pressed="${n === state.block}"><strong>Block ${n}</strong><span class="depth-attention">Attention</span>${layerSketch()}</button>`).join("")}</div><p class="depth-caption">32 blocks in sequence · separate learned weights in every block</p>`;
 }
 function languageHTML() {
   const ex = languageExamples[state.country];
-  return `<div class="workspace llm-workspace fade-in"><aside class="input-panel"><p class="panel-label">01 / Context</p><label class="sr-only" for="country">Choose a prompt</label><select class="prompt-select" id="country">${Object.keys(
+  return `<div class="workspace llm-workspace fade-in"><span id="transformer-signal" aria-hidden="true" hidden></span><aside class="input-panel"><p class="panel-label">01 / Context</p><label class="sr-only" for="country">Choose a prompt</label><select class="prompt-select" id="country">${Object.keys(
     languageExamples,
   )
     .map(
@@ -296,7 +329,7 @@ function languageHTML() {
     )
     .join(
       "",
-    )}</select><div class="token-list" id="token-list">${ex.tokens.map((t) => `<span class="token">${t}</span>`).join("")}<span class="token next-token">?</span></div><p class="hint-box">Text becomes tokens, then vectors of numbers.<br><br>Real tokens can be words, parts of words, or punctuation. These chunks are simplified.</p><span class="model-badge">Schematic · no LLM running</span></aside><div class="llm-network"><div class="llm-label"><span>Inside a decoder-only transformer</span><span class="illustration-tag">Values are illustrative</span></div><div class="transformer-flow"><div class="embedding-block">Token embeddings</div><span class="flow-arrow">→</span><div class="stack-wrap"><div class="transformer-block"><div class="block-heading"><span>Transformer block</span><strong id="selected-block">${state.block} / 32</strong></div><div class="block-core"><p class="normalization">NORM + POSITION IN ATTENTION</p><button class="block-part ${state.part === "attention" ? "active" : ""}" data-part="attention" aria-pressed="${state.part === "attention"}">Self-attention<small>Mix information across tokens</small></button><div class="block-plus">↓</div><p class="normalization">NORM</p><button class="block-part ${state.part === "feedforward" ? "active" : ""}" data-part="feedforward" aria-pressed="${state.part === "feedforward"}">Feed-forward network${layerSketch()}<small>Two projections + SwiGLU gate</small><small class="ffn-width">4,096 → wider → 4,096 features</small></button><div class="block-plus">↓</div></div><p class="block-footer">+ residual paths around both sublayers</p></div></div><span class="flow-arrow">→</span><div class="head-block">Final norm → scores → softmax</div></div>${transformerDepth()}</div><aside class="output-panel"><p class="panel-label">03 / Next token</p><div class="prediction"><span class="prediction-value" id="language-result">${ex.next[0]}</span></div><div class="probability-list" id="language-probabilities">${probabilities(softmax(ex.scores), ex.next)}</div><p class="output-note">Four invented candidate scores, for illustration. Real models score the full vocabulary.</p><button id="language-step" class="primary-button">Step through the process →</button><div class="step-status" id="step-status">Click a block to look inside.</div></aside></div><div class="trace llm-trace" id="language-trace"></div>`;
+    )}</select><div class="token-list" id="token-list">${ex.tokens.map((t) => `<span class="token">${t}</span>`).join("")}<span class="token next-token">?</span></div><p class="hint-box">Text becomes tokens, then vectors of numbers.<br><br>Real tokens can be words, parts of words, or punctuation. These chunks are simplified.</p><span class="model-badge">Schematic · no LLM running</span></aside><div class="llm-network"><div class="llm-label"><span>Inside a decoder-only transformer</span><span class="illustration-tag">Values are illustrative</span></div><div class="transformer-flow"><div class="embedding-block">Token embeddings</div><span class="flow-arrow">→</span><div class="stack-wrap"><div class="transformer-block"><div class="block-heading"><span>Transformer block</span><strong id="selected-block">${state.block} / 32</strong></div><div class="block-core"><p class="normalization">NORM + POSITION IN ATTENTION</p><button class="block-part ${state.part === "attention" ? "active" : ""}" data-part="attention" aria-pressed="${state.part === "attention"}">Self-attention<small>Mix information across tokens</small></button><div class="block-plus">↓</div><p class="normalization">NORM</p><button class="block-part ${state.part === "feedforward" ? "active" : ""}" data-part="feedforward" aria-pressed="${state.part === "feedforward"}">Feed-forward network${layerSketch()}<small>Two projections + SwiGLU gate</small><small class="ffn-width">4,096 → wider → 4,096 features</small></button><div class="block-plus">↓</div></div><p class="block-footer">+ residual paths around both sublayers</p></div></div><span class="flow-arrow">→</span><div class="head-block">Final norm → scores → softmax</div></div>${transformerDepth()}</div><aside class="output-panel"><p class="panel-label">03 / Next token</p><div class="prediction"><span class="prediction-value" id="language-result">${ex.next[0]}</span></div><div class="probability-list" id="language-probabilities">${probabilities(softmax(ex.scores), ex.next)}</div><p class="output-note">Four invented candidate scores, for illustration. Real models score the full vocabulary.</p><button id="language-step" class="primary-button">Next flow step →</button><div class="step-status" id="step-status">Animated schematic · no LLM inference</div></aside></div><div class="trace llm-trace" id="language-trace"></div>`;
 }
 function renderStage(index, fromTour = false) {
   if (!fromTour && tour.playing) pauseTour();
@@ -424,25 +457,32 @@ function renderStage(index, fromTour = false) {
   else if (index === 2) {
     $("#country").addEventListener("change", (e) => {
       state.country = e.target.value;
-      state.step = 0;
       renderStage(2);
     });
     $$("[data-part]").forEach((b) =>
       b.addEventListener("click", () => {
+        pauseTour();
+        signalFlow.setPlaying(false);
         state.part = b.dataset.part;
         renderLanguageTrace();
       }),
     );
     $$("[data-block]").forEach((button) =>
       button.addEventListener("click", () => {
+        pauseTour();
+        signalFlow.setPlaying(false);
         state.block = Number(button.dataset.block);
         state.part = "feedforward";
         renderLanguageTrace();
       }),
     );
-    $("#language-step").addEventListener("click", languageStep);
+    $("#language-step").addEventListener("click", () => {
+      pauseTour();
+      signalFlow.step();
+    });
     renderLanguageTrace();
   }
+  signalFlow.reset(index);
 }
 function updateNetwork() {
   if (state.stage === 0) {
@@ -512,6 +552,7 @@ function updateNetwork() {
     });
   }
   attachNeuronHandlers();
+  signalFlow.reset(state.stage);
 }
 function setDigit(digit) {
   state.pixels = [...digitPatterns[digit]];
@@ -539,34 +580,6 @@ function renderLanguageTrace() {
     $("#language-trace").innerHTML =
       `<div><p class="trace-title">Feed-forward sublayer</p><p class="trace-copy">Each token passes through the same feed-forward network.</p></div><div><div class="feedforward-mini"><div class="ffn-detail">${layerSketch()}<div class="ffn-labels"><span>Input</span><span>Gated features</span><span>Output</span></div></div></div><p class="trace-copy" style="margin-top:9px">Two learned projections are combined by a SwiGLU gate, then projected back. Sketch: a few representative features, not individual model neurons.</p></div><p class="scale-note"><strong>Shared computational building blocks.</strong><br>Digits: 3 hidden layers, 1,598 parameters. Llama 3 8B: 32 blocks, about 8 billion parameters — roughly 5 million times as many.</p>`;
   }
-}
-const stepDescriptions = [
-  "1 / 4 · Tokens become vectors of numbers.",
-  "2 / 4 · Attention mixes the available context.",
-  "3 / 4 · Feed-forward layers transform features; blocks repeat.",
-  "4 / 4 · Select a next token, append it, and repeat.",
-];
-function languageStep() {
-  const step = state.step % 4;
-  const ex = languageExamples[state.country];
-  $("#step-status").textContent = stepDescriptions[step];
-  if (step === 0) {
-    $("#token-list").innerHTML =
-      ex.tokens.map((t) => `<span class="token">${t}</span>`).join("") +
-      '<span class="token next-token">?</span>';
-    state.part = "attention";
-  }
-  if (step === 1) state.part = "attention";
-  if (step === 2) state.part = "feedforward";
-  if (step === 3)
-    $("#token-list").innerHTML =
-      ex.tokens.map((t) => `<span class="token">${t}</span>`).join("") +
-      `<span class="token">${ex.next[0]}</span><span class="token next-token">?</span>`;
-  state.block = step >= 2 ? 32 : step === 1 ? 2 : 1;
-  $("#language-step").textContent =
-    step === 3 ? "Replay the process ↺" : "Next step →";
-  state.step++;
-  renderLanguageTrace();
 }
 const storyEvents = [
   {
@@ -664,28 +677,16 @@ const storyEvents = [
     at: 56,
     caption:
       "Transformers add attention: tokens mix information from their context. These values are illustrative.",
-    action: () => {
-      state.step = 1;
-      languageStep();
-    },
   },
   {
     at: 62,
     caption:
       "Inside every block is a feed-forward network: a familiar building block, repeated many times.",
-    action: () => {
-      state.step = 2;
-      languageStep();
-    },
   },
   {
     at: 68,
     caption:
       "The output scores possible next tokens. Select one, add it to the context, and repeat.",
-    action: () => {
-      state.step = 3;
-      languageStep();
-    },
   },
   {
     at: 73,
@@ -726,18 +727,21 @@ function tourFrame(now) {
     tour.elapsed = Math.min(75, tour.elapsed + (now - tour.last) / 1000);
   tour.last = now;
   applyStoryEvents();
+  if (state.stage === 2) signalFlow.syncTour(tour.elapsed - 50);
   $("#story-progress").style.width = (tour.elapsed / 75) * 100 + "%";
   const seconds = Math.floor(tour.elapsed);
   $("#story-time").textContent =
     `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")} / 1:15`;
   if (tour.elapsed >= 75) {
     tour.playing = false;
+    signalFlow.setPlaying(false);
     updateTourControls();
     return;
   }
   tour.raf = requestAnimationFrame(tourFrame);
 }
 function pauseTour() {
+  signalFlow.setPlaying(false);
   tour.playing = false;
   cancelAnimationFrame(tour.raf);
   tour.last = 0;
@@ -760,6 +764,7 @@ function toggleTour() {
   }
   tour.active = true;
   tour.playing = true;
+  signalFlow.setPlaying(true);
   tour.last = 0;
   $("#story-caption").textContent =
     storyEvents[Math.max(0, tour.event)].caption;
@@ -782,6 +787,7 @@ function endTour() {
   updateTourControls();
 }
 function modal(id) {
+  signalFlow.setPlaying(false);
   if (tour.playing) pauseTour();
   $(id).showModal();
 }
@@ -902,7 +908,24 @@ async function loadModel() {
   }
   if (state.stage === 1) renderStage(1, true);
 }
+$("#flow-toggle").addEventListener("click", () => {
+  const play = !signalFlow.playing;
+  if (tour.playing) pauseTour();
+  signalFlow.setPlaying(play);
+});
+$("#flow-replay").addEventListener("click", () => {
+  if (tour.playing) pauseTour();
+  signalFlow.reset();
+  signalFlow.setPlaying(
+    !matchMedia("(prefers-reduced-motion: reduce)").matches,
+  );
+});
+$("#flow-step").addEventListener("click", () => {
+  if (tour.playing) pauseTour();
+  signalFlow.step();
+});
 initializeLanguage(document);
 const initial = stages.findIndex((s) => location.hash === "#" + s.hash);
 renderStage(initial < 0 ? 0 : initial);
 await loadModel();
+signalFlow.start();

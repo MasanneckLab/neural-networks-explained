@@ -2450,3 +2450,169 @@ html[lang="de"] .llm-trace .feedforward-mini {
     margin: 2px 0;
   }
 }
+
+/* A single teaching clock drives the same visual language in all three models. */
+.signal-controls {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 40px;
+  margin: -6px 0 15px;
+  padding: 6px 0 10px;
+  font-size: 11px;
+}
+.flow-status {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex: 1;
+  min-width: 0;
+}
+.flow-status strong {
+  font-weight: 500;
+}
+#flow-counter {
+  color: var(--muted);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.flow-key {
+  flex: 0 0 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #bd8932;
+}
+.flow-timing {
+  color: var(--muted);
+}
+.flow-buttons {
+  display: flex;
+  gap: 5px;
+  flex-shrink: 0;
+}
+.flow-buttons button {
+  font: inherit;
+  border: 1px solid #c8cec1;
+  border-radius: 5px;
+  background: transparent;
+  padding: 5px 10px;
+  color: var(--ink);
+  cursor: pointer;
+}
+.flow-buttons button:hover {
+  background: #f2ead8;
+}
+#flow-toggle {
+  min-width: 114px;
+}
+.flow-track {
+  position: absolute;
+  bottom: 0;
+  height: 2px;
+  left: 0;
+  right: 0;
+  background: #e3e6da;
+}
+#flow-progress {
+  display: block;
+  background: #bd8932;
+  height: 100%;
+}
+.flow-signal {
+  fill: #bd8932 !important;
+  stroke: #fffefa !important;
+  stroke-width: 1 !important;
+  opacity: 0;
+  pointer-events: none;
+}
+.flow-node-active > circle {
+  stroke: #bd8932 !important;
+  stroke-width: 3 !important;
+  filter: drop-shadow(0 0 3px #bd893277);
+}
+.flow-active {
+  outline: 2px solid #bd8932 !important;
+  outline-offset: 3px;
+  box-shadow: 0 0 0 6px #bd893212;
+}
+.llm-workspace {
+  position: relative;
+}
+#transformer-signal {
+  position: absolute;
+  z-index: 4;
+  pointer-events: none;
+  width: 10px;
+  height: 10px;
+  margin: -5px;
+  background: #bd8932;
+  border: 1.5px solid #fffefa;
+  border-radius: 50%;
+  box-shadow: 0 0 9px #bd893288;
+}
+@media (max-width: 800px) {
+  .signal-controls {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .flow-status {
+    flex-basis: 100%;
+    min-height: 28px;
+  }
+  .flow-timing {
+    flex: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .flow-signal,
+  #transformer-signal {
+    display: none !important;
+  }
+}
+@media (min-width: 1101px) and (max-height: 950px) {
+  .presenting .signal-controls {
+    min-height: 30px;
+    margin: -8px 0 8px;
+    padding-bottom: 6px;
+  }
+  .presenting .stage-heading {
+    margin-bottom: 10px;
+  }
+  .presenting .llm-network {
+    padding-top: 8px;
+    padding-bottom: 8px;
+    gap: 4px;
+  }
+  .presenting .transformer-block {
+    padding: 7px 10px;
+  }
+  .presenting .block-part {
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+  .presenting .block-part .layer-sketch {
+    height: 28px;
+  }
+  .presenting .block-footer {
+    margin-top: 3px;
+  }
+}
+.layer-sketch .flow-feature-active {
+  stroke: #bd8932;
+  stroke-width: 2;
+  fill: #f4d99c;
+}
+.illustrated-token {
+  outline: 2px solid #bd8932;
+  outline-offset: 1px;
+}
+@media (min-width: 1101px) and (max-height: 950px) {
+  .presenting .common-thread {
+    padding-top: 6px;
+    padding-bottom: 6px;
+  }
+  .presenting .signal-controls {
+    margin-bottom: 4px;
+  }
+}

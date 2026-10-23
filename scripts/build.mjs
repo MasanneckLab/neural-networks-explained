@@ -15,6 +15,7 @@ const styleVersion = createHash("sha256")
 const modelVersion = createHash("sha256");
 for (const file of [
   "src/app.js",
+  "src/signal-flow.js",
   "src/models.js",
   "src/i18n.js",
   "public/assets/digit-model.json",
@@ -22,6 +23,7 @@ for (const file of [
   modelVersion.update(await readFile(file));
 const moduleVersion = modelVersion.digest("hex").slice(0, 12);
 const app = (await readFile("src/app.js", "utf8"))
+  .replace('"./signal-flow.js"', `"./signal-flow.js?v=${moduleVersion}"`)
   .replace('"./models.js"', `"./models.js?v=${moduleVersion}"`)
   .replace('"./i18n.js"', `"./i18n.js?v=${moduleVersion}"`)
   .replace(

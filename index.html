@@ -119,6 +119,30 @@
             ><span id="parameter-description"></span>
           </div>
         </div>
+        <div
+          id="signal-controls"
+          class="signal-controls"
+          role="group"
+          aria-label="Information flow animation"
+        >
+          <div class="flow-status">
+            <span class="flow-key" aria-hidden="true"></span
+            ><span id="flow-counter"></span><strong id="flow-label"></strong>
+          </div>
+          <span
+            class="flow-timing"
+            title="Gold marks information flow, not activation strength. Moving dots show selected connections; all connections contribute to the result."
+            >Illustrative timing</span
+          >
+          <div class="flow-buttons">
+            <button id="flow-toggle" aria-pressed="true">Pause flow</button
+            ><button id="flow-replay" aria-label="Replay flow">↺</button
+            ><button id="flow-step" aria-label="Next flow step">→</button>
+          </div>
+          <div class="flow-track" aria-hidden="true">
+            <span id="flow-progress"></span>
+          </div>
+        </div>
         <div id="stage-content"></div>
       </section>
 
