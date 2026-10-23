@@ -1942,3 +1942,9 @@ dialog h2 {
     display: none;
   }
 }
+
+@media (min-width: 801px) {
+  .presenting .intro .eyebrow {
+    display: none;
+  }
+}
